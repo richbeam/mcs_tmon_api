@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="OrderMapper">
+
+	<!-- 주문조회 -->
+	<select id="selectCommOrderCdChek" parameterType="hashMap" resultType="hashMap">
+		/* OrderMapper.selectCommOrderCdChek */
+		SELECT m_ordercd                  /* 멸치 주문코드                 */
+		  FROM tmon_orders
+		 WHERE ordercd = #{ordercd}::TEXT
+	</select>
+	
+	<!-- 주문조회등록 -->
+	<insert id="insertTmonOrders" parameterType="hashMap">
+		/* OrderMapper.insertTmonOrders */
+		INSERT INTO tmon_orders
+		(
+			  ORDERCD
+			, M_ORDERCD
+			, REGDATE
+		) VALUES (
+			  #{ordercd}
+			, #{m_ordercd}
+			, NOW()
+		)
+	</insert>
+	
+	<!-- 주문조회 -->
+	<select id="selectCommOrders" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectCommOrders */
+		SELECT M_ORDERCD                /* 멸치주문코드             */
+			 , SITENAME                 /* 사이트명                 */
+			 , ORDERCD                  /* 주문코드                 */
+			 , SELLERCD                 /* 판매자 코드              */
+			 , AMOUNT                   /* 주문금액                 */
+			 , recvperson               /* 받는사람 이름            */
+			 , recvtel                  /* 받는사람 연락처          */
+			 , recvhp                   /* 받는사람 핸드폰 번호     */
+			 , recvpostcode1            /* 받는사람 우편번호1       */
+			 , recvpostcode2            /* 받는사람 우편번호2       */
+			 , recvaddress1             /* 받는사람 지번주소        */
+			 , recvaddress2             /* 받는사람 지번 상세주소   */
+			 , recvrnaddress1           /* 받는사람 도로명주소      */
+			 , recvrnaddress2           /* 받는사람 도로명 상세주소 */
+			 , recvmessage              /* 배송 메세지              */
+			 , APIINDEXING              /* 멸치쇼핑 이관여부        */
+			 , INDEXINGDATE             /* 최종 수정일              */
+		  FROM COMM_ORDERS
+		 WHERE 1=1
+		<if test="ordercd != null and ordercd != ''">
+		   AND ORDERCD = #{ordercd}::TEXT /* 결제번호 */
+		</if>
+		<if test="m_ordercd != null and m_ordercd != ''">
+		   AND M_ORDERCD = #{m_ordercd}::TEXT /* 멸치주문코드 */
+		</if>
+		 LIMIT 1
+	</select>
+	
+	<!-- 멸치 상태별 주문상세목록 조회 -->
+	<select id="selectCommOrderDetail" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectCommOrderDetail */
+		SELECT cod.ordercd                    /* 주문코드             */
+			 , cod.m_ordercd                  /* 멸치주문코드        */
+			 , cod.sitename                   /* 사이트명             */
+			 , cod.productcd                  /* 상품 코드            */
+			 , cod.shippingfee                /* 배송비               */
+			 , cod.status                     /* 주문상태 값         */
+			 , cod.detail_no                  /* 주문상세번호        */
+			 , cod.qty                        /* 주문수량             */
+			 , cod.shippingmethod             /* 배송방법             */
+			 , cod.shippingno                 /* 운송장 번호          */
+			 , cod.delicomcd                  /* 택배사 코드          */
+			 , sp.productno                   /* 상품아이디           */
+		  FROM comm_order_details cod 
+			   INNER JOIN tmon_products sp ON sp.productcd = cod.productcd
+		 WHERE 1=1
+		   AND cod.sitename = #{sitename}
+		   AND cod.status = #{status}
+		   AND cod.apiindexing = #{apiindexing}
+	</select>
+	
+	<!-- 멸치 발송처리 대상 조회 -->
+	<select id="selectCommOrderDetailShip" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectCommOrderDetail */
+		SELECT cod.ordercd                    /* 주문코드             */
+			 , cod.m_ordercd                  /* 멸치주문코드        */
+			 , cod.sitename                   /* 사이트명             */
+			 , cod.productcd                  /* 상품 코드            */
+			 , cod.shippingfee                /* 배송비               */
+			 , cod.status                     /* 주문상태 값         */
+			 , cod.detail_no                  /* 주문상세번호        */
+			 , cod.qty                        /* 주문수량             */
+			 , cod.shippingmethod             /* 배송방법             */
+			 , cod.shippingno                 /* 운송장 번호          */
+			 , cod.delicomcd                  /* 택배사 코드          */
+			 , sp.productno                   /* 상품아이디           */
+		  FROM comm_order_details cod 
+			   INNER JOIN tmon_products sp ON sp.productcd = cod.productcd
+		 WHERE 1=1
+		   AND cod.sitename = #{sitename}
+		   AND cod.status = #{status}
+		   AND cod.apiindexing = #{apiindexing}
+		   
+	</select>
+
+	<!-- 멸치 재호출 발송처리 대상 조회 -->
+	<select id="selectCommOrderDetailByLog" parameterType="hashMap" resultType="hashMap">
+		/* OrderMapper.selectCommOrderDetailByLog */
+		SELECT cod.ordercd                    /* 주문코드             */
+			 , cod.m_ordercd                  /* 멸치주문코드        */
+			 , cod.sitename                   /* 사이트명             */
+			 , cod.productcd                  /* 상품 코드            */
+			 , cod.shippingfee                /* 배송비               */
+			 , cod.status                     /* 주문상태 값         */
+			 , cod.detail_no                  /* 주문상세번호        */
+			 , cod.qty                        /* 주문수량             */
+			 , cod.shippingmethod             /* 배송방법             */
+			 , cod.shippingno                 /* 운송장 번호          */
+			 , cod.delicomcd                  /* 택배사 코드          */
+			 , sp.productno                   /* 상품아이디           */
+		FROM comm_order_details cod
+		INNER JOIN tmon_products sp ON sp.productcd = cod.productcd
+		LEFT OUTER JOIN schedule_log sl ON cod.ordercd = sl.ordercd AND cod.productcd = sl.productcd AND sl.api_url = #{api_url}
+		WHERE 1=1
+		  AND cod.sitename = #{sitename}
+		  AND cod.status = #{status}
+		  AND cod.apiindexing = #{apiindexing}
+		  AND sl.seq is null
+	</select>
+
+	<!-- 주문상세조회 -->
+	<select id="selectCommOrderDetailUpdate" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectCommOrderDetail */
+		SELECT comm_order_details.ordercd                    /* 주문코드             */
+			 , comm_order_details.m_ordercd                  /* 멸치주문코드        */
+			 , comm_order_details.productcd                  /* 상품 코드            */
+			 , comm_order_details.sellingprice               /* 주문 금액            */
+			 , comm_order_details.supplyprice                /* 배송비총액           */
+			 , comm_order_details.qty                        /* 주문수량             */
+			 , comm_order_details.amount                     /* 상품 판매가          */
+			 , comm_order_details.shipfinisheddate           /* 배송 완료일          */
+			 , comm_order_details.shippingno                 /* 운송장 번호          */
+			 , comm_order_details.delicomcd                  /* 택배사 코드          */
+			 , comm_order_details.shippingfeetype            /* 배송비방식           */
+			 , comm_order_details.shippingfee                /* 배송비               */
+			 , comm_order_details.shippingmethod             /* 배송방법             */
+			 , comm_order_details.shippingpersontel          /* 배송기사연락처       */
+			 , comm_order_details.shippingfeepaytype         /* 배송비결제방식       */
+			 , comm_order_details.chargedshippingfee         /* 부과된배송비         */
+			 , comm_order_details.import_clearance_orderder1 /* 개인통관번호         */
+			 , comm_order_details.import_clearance_orderder2 /* 수입통관 주문자 정보 */
+			 , comm_order_details.int_deliv_yn               /* 국제배송 여부        */
+			 , comm_order_details.int_deliv_stat_cd          /* 국제배송 상태코드    */
+			 , comm_order_details.additionalshippingfee      /* 도서산간 추가 배송비 */
+			 , comm_order_details.status                     /* 주문상태 값          */
+			 , comm_order_details.regdate                    /* 등록일               */
+			 , comm_order_details.modifydate                 /* 수정일               */
+			 , comm_order_details.apiindexing                /* 멸치쇼핑 이관여부    */
+			 , comm_order_details.indexingdate               /* 최종 수정일          */
+			 , comm_order_details.cancel_reason              /* 취소사유             */    
+		  FROM comm_order_details           
+		 WHERE comm_order_details.ordercd = #{ordercd}::TEXT
+		   AND comm_order_details.detail_no = #{detail_no}::TEXT 
+		   AND comm_order_details.sitename = #{sitename} 
+	</select>
+	
+	<!-- tmon 상품 조회 -->
+	<select id="selectProducts" parameterType="hashMap" resultType="hashMap"> 
+		/* ProdMapper.selectProducts */
+		 SELECT sp.productno
+			  , cp.productcd
+			  , cp.catecd
+			  , cp.sellercd
+			  , cp.status
+			  , cp.sellingprice
+			  , cp.shippingfee
+			  , COALESCE(cp.freeshippingamount,0) AS freeshippingamount
+			  , COALESCE(cp.additionalshippingfee,0) AS additionalshippingfee
+			  , CASE WHEN sp.supplyprice > 0 THEN sp.supplyprice
+					 ELSE cp.supplyprice
+				END as supplyprice
+			  , cp.shippingfeetype
+			  , cs.sellercd
+			  , cp.shippingmethod
+			  , cs.shippingcompanycd
+			  , cp.shippingfeepaytype
+			  , cp.quantitycntuseyn
+			  , cp.salelimitcnt
+		   FROM comm_products cp
+				JOIN tmon_products sp on cp.productcd = sp.productcd
+				JOIN comm_sellers cs on cp.sellercd = cs.sellercd
+		  WHERE sp.productno = #{tmonDealNo}::numeric
+	</select>
+	
+	<!-- TMON 상품옵션 조회 -->
+	<select id="selectTmonProductOpt" parameterType="hashMap" resultType="hashMap">
+	/* ProdMapper.selectTmonProductOpt */
+		SELECT productno
+			 , productoptionno
+			 , productoptioncd
+		  FROM tmon_product_opt
+		 WHERE productcd = #{productcd}::NUMERIC
+		   AND productoptionno = #{productoptionno}::NUMERIC
+	</select>
+	
+	<!-- 멸치 상품옵션 조회 -->
+	<select id="selectProductOpt" parameterType="hashMap" resultType="hashMap">
+	/* ProdMapper.selectProductOpt */
+		SELECT productoptioncd 
+			 , productcd
+			 , optiongroupno
+			 , optiongroupname
+			 , optionitem
+			 , optionitemdetail
+			 , optionprice
+		  FROM comm_product_opts
+		 WHERE productoptioncd = #{productoptioncd}::NUMERIC
+	</select>
+	
+	<!-- 주문조회등록 -->
+	<insert id="insertCommOrders" parameterType="hashMap">
+	/* OrderMapper.insertCommOrders */
+		INSERT INTO COMM_ORDERS  
+		(
+			  ORDERCD                  /* 주문코드                 */
+			, M_ORDERCD                /* 멸치주문코드             */
+			, SITENAME                 /* 사이트명                 */
+			, SELLERCD                 /* 판매자 코드              */
+			, AMOUNT                   /* 주문금액                 */
+			, SHIPAMOUNT               /* 공급가                   */
+			, DISCOUNTAMOUNT           /* 할인총액                 */
+			, USEDSHOPPINGPOINTAMOUNT  /* 사용한쇼핑포인트금액     */
+			, USEDANCHOVYPOINTAMOUNT   /* 사용한멸치포인트금액     */
+			, USEDEMONEYAMOUNT         /* 사용한이머니금액         */
+			, RECVPERSON               /* 받는사람 이름            */
+			, RECVTEL                  /* 받는사람 연락처          */
+			, RECVHP                   /* 받는사람 핸드폰 번호     */
+			, RECVPOSTCODE1            /* 받는사람 우편번호1       */
+			, RECVPOSTCODE2            /* 받는사람 우편번호2       */
+			, RECVADDRESS1             /* 받는사람 지번주소        */
+			, RECVADDRESS2             /* 받는사람 지번 상세주소   */
+			, RECVRNADDRESS1           /* 받는사람 도로명주소      */
+			, RECVRNADDRESS2           /* 받는사람 도로명 상세주소 */
+			, RECVMESSAGE              /* 배송 메세지              */
+			, ORDERDATE                /* 주문일자                 */
+			, REFUNDDATE               /* 결제취소처리일자         */
+			, REFUNDAMOUNT1            /* 신용카드취소금액         */
+			, REFUNDAMOUNT2            /* 가상계좌취소금액         */
+			, REFUNDAMOUNT3            /* 이머니취소금액           */
+			, REFUNDAMOUNT4            /* 멸치포인트취소금액       */
+			, REFUNDAMOUNT5            /* 쇼핑포인트취소금액       */ 
+			, REFUNDACCOUNTCD          /* 결제취소처리자           */
+			, ORDERCHANNEL             /*                          */
+			, REFUNDBANKCD             /*                          */
+			, REFUNDACCOUNTNUM         /*                          */
+			, REFUNDDEPOSITOR          /*                          */
+			, OUTSIDEPOST              /* 도서산간 배송 여부       */
+			, REGDATE                  /* 등록일                   */
+			, MODIFYDATE               /* 수정일                   */
+			, APIINDEXING              /* 멸치쇼핑 이관여부        */
+			, INDEXINGDATE             /* 최종 수정일              */
+			, orderfullcontents        /* 주문생성시 최초전문   */
+		) VALUES (
+			  #{ordercd}                          /* 주문코드                 */
+			, #{m_ordercd}                        /* 멸치주문코드             */
+			, 'TMON'                               /* 사이트명                 */
+			, #{sellercd}::NUMERIC                /* 판매자 코드              */
+			, #{amount}::NUMERIC                  /* 주문금액                 */
+			, #{shipamount}::NUMERIC              /* 공급가                   */
+			, #{discountamount}::NUMERIC          /* 할인총액                 */
+			, #{usedshoppingpointamount}::NUMERIC /* 사용한쇼핑포인트금액     */
+			, #{usedanchovypointamount}::NUMERIC  /* 사용한멸치포인트금액     */
+			, #{usedemoneyamount}::NUMERIC        /* 사용한이머니금액         */
+			, #{recvperson}                       /* 받는사람 이름            */
+			, #{recvtel}                          /* 받는사람 연락처          */
+			, #{recvhp}                           /* 받는사람 핸드폰 번호     */
+			, #{recvpostcode1}                    /* 받는사람 우편번호1       */
+			, #{recvpostcode2}                    /* 받는사람 우편번호2       */
+			, #{recvaddress1}                     /* 받는사람 지번주소        */
+			, #{recvaddress2}                     /* 받는사람 지번 상세주소   */
+			, #{recvrnaddress1}                   /* 받는사람 도로명주소      */
+			, #{recvrnaddress2}                   /* 받는사람 도로명 상세주소 */
+			, #{recvmessage}                      /* 배송 메세지              */
+			, NOW()                               /* 주문일자                 */
+			, #{refunddate}                       /* 결제취소처리일자         */
+			, #{refundamount1}::NUMERIC           /* 신용카드취소금액         */
+			, #{refundamount2}::NUMERIC           /* 가상계좌취소금액         */
+			, #{refundamount3}::NUMERIC           /* 이머니취소금액           */
+			, #{refundamount4}::NUMERIC           /* 멸치포인트취소금액       */
+			, #{refundamount5}::NUMERIC           /* 쇼핑포인트취소금액       */
+			, #{refundaccountcd}                  /* 결제취소처리자           */
+			, #{orderchannel}                     /*                          */
+			, #{refundbankcd}                     /*                          */
+			, #{refundaccountnum}                 /*                          */
+			, #{refunddepositor}                  /*                          */
+			, #{outsidepost}::NUMERIC             /* 도서산간 배송 여부       */
+			, NOW()                               /* 등록일                   */
+			, NOW()                               /* 수정일                   */
+			, 'N'                                 /* 멸치쇼핑 이관여부        */
+			, NOW()                               /* 최종 수정일              */
+			, #{orderfullcontents}                /* 주문생성시 최초전문   */
+		)
+	</insert>
+	
+	<!-- 주문 배송지 수정 -->
+	<update id="updateCommOrders" parameterType="hashMap">
+	/* OrderMapper.updateCommOrders */
+		UPDATE COMM_ORDERS
+		   SET RECVPERSON = #{recvperson}             /* 받는사람 이름            */
+			 , RECVTEL = #{recvtel}                 /* 받는사람 연락처          */
+			 , RECVHP = #{recvhp}                   /* 받는사람 핸드폰 번호     */
+			 , RECVPOSTCODE1 = #{recvpostcode1}     /* 받는사람 우편번호1       */
+			 , RECVPOSTCODE2 = #{recvpostcode2}     /* 받는사람 우편번호2       */
+			 , RECVADDRESS1 = #{recvaddress1}       /* 받는사람 지번주소        */
+			 , RECVADDRESS2 = #{recvaddress2}       /* 받는사람 지번 상세주소   */
+			 , RECVRNADDRESS1 = #{recvrnaddress1}   /* 받는사람 도로명주소      */
+			 , RECVRNADDRESS2 = #{recvrnaddress2}   /* 받는사람 도로명 상세주소 */
+			 , RECVMESSAGE    = #{recvmessage}      /* 배송 메세지              */
+			 , MODIFYDATE     = NOW()               /* 수정일                   */
+			 , APIINDEXING    = 'N'                 /* 멸치쇼핑 이관여부        */
+			 , INDEXINGDATE   = NOW()               /* 최종 수정일              */
+		 WHERE 1=1
+		<if test="ordercd != null and ordercd != ''">
+		   AND ORDERCD = #{ordercd}::TEXT /* 결제번호 */
+		</if>
+		<if test="m_ordercd != null and m_ordercd != ''">
+		   AND M_ORDERCD = #{m_ordercd}::TEXT /* 멸치주문코드 */
+		</if>
+	</update>
+	
+	<!-- 주문 금액수정-->
+	<update id="updateCommOrderAmount" parameterType="hashMap">
+	/* OrderMapper.updateCommOrderAmount */
+		UPDATE COMM_ORDERS od
+		   SET amount = (select SUM(amount) from comm_order_details where m_ordercd = od.m_ordercd)
+			 , MODIFYDATE     = NOW()               /* 수정일                   */
+			 , APIINDEXING    = 'N'                 /* 멸치쇼핑 이관여부        */
+			 , INDEXINGDATE   = NOW()               /* 최종 수정일              */
+		 WHERE 1=1
+		<if test="ordercd != null and ordercd != ''">
+		   AND ORDERCD = #{ordercd}::TEXT /* 결제번호 */
+		</if>
+		<if test="m_ordercd != null and m_ordercd != ''">
+		   AND M_ORDERCD = #{m_ordercd}::TEXT /* 멸치주문코드 */
+		</if>
+	</update>
+	
+	<!-- 주문상세조회 신규일때 -->
+	<select id="selectCommOrderDetailNew" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectCommOrderDetailNew */
+		SELECT M_ORDERCD                  /* 멸치주문코드         */
+			 , ORDERCD                    /* 주문코드             */
+		  FROM COMM_ORDER_DETAILS         
+		 WHERE 1 = 1
+		<if test="ordercd != null and ordercd != ''">
+		   AND ORDERCD    = #{ordercd}::TEXT
+		</if>
+		<if test="detail_no != null and detail_no != ''">
+		   AND detail_no    = #{detail_no}::TEXT
+		</if>     
+		<if test="productcd != null and productcd != ''">
+		   AND PRODUCTCD  = #{productcd}::NUMERIC
+		</if>
+		 LIMIT 1
+	</select>
+	
+	<!-- 주문상세 수량조회-->
+	<select id="selectCommOrderDetailQty" parameterType="hashMap" resultType="hashMap">
+		/* OrderMapper.selectCommOrderDetailQty */
+		SELECT COALESCE(SUM(qty),0) as qty
+		  FROM COMM_ORDER_DETAILS         
+		 WHERE 1 = 1
+		<if test="ordercd != null and ordercd != ''">
+		   AND ORDERCD    = #{ordercd}::TEXT
+		</if>
+		<if test="productcd != null and productcd != ''">
+		   AND PRODUCTCD  = #{productcd}::NUMERIC
+		</if>
+		<if test="m_ordercd != null and m_ordercd != ''">
+			AND M_ORDERCD = #{m_ordercd}::TEXT /* 멸치주문코드 */
+		</if>
+	</select>
+	
+	<!-- 주문상세등록 -->
+	<insert id="insertCommOrderDetail" parameterType="hashMap">
+	/* OrderMapper.insertCommOrderDetail */
+		INSERT INTO COMM_ORDER_DETAILS  
+		(
+			M_ORDERCD                   /* 멸치주문코드         */
+			, ORDERCD                     /* 주문코드             */
+			, PRODUCTCD                   /* 상품 코드            */
+			, SITENAME                    /* 사이트명             */
+			, DETAIL_NO                   /* 주문상세번호         */
+			, SELLINGPRICE                /* 주문 금액            */
+			, SUPPLYPRICE                 /* 공급가               */
+			, QTY                         /* 주문수량             */
+			, AMOUNT                      /* 상품 판매가          */
+			, SHIPFINISHEDDATE            /* 배송 완료일          */
+			, SHIPPINGNO                  /* 운송장 번호          */
+			, DELICOMCD                   /* 택배사 코드          */
+			, SHIPPINGFEETYPE             /* 배송비방식           */
+			, SHIPPINGFEE                 /* 배송비               */
+			, SHIPPINGMETHOD              /* 배송방법             */
+			, SHIPPINGPERSONTEL           /* 배송기사연락처       */
+			, SHIPPINGFEEPAYTYPE          /* 배송비결제방식       */
+			, CHARGEDSHIPPINGFEE          /* 부과된배송비         */
+			, IMPORT_CLEARANCE_ORDERDER1  /* 개인통관번호         */
+			, IMPORT_CLEARANCE_ORDERDER2  /* 수입통관 주문자 정보 */
+			, INT_DELIV_YN                /* 국제배송 여부        */
+			, INT_DELIV_STAT_CD           /* 국제배송 상태코드    */
+			, ADDITIONALSHIPPINGFEE       /* 도서산간 추가 배송비 */
+			, STATUS                      /* 주문상태 값          */
+			, REGDATE                     /* 등록일               */
+			, MODIFYDATE                  /* 수정일               */
+			, APIINDEXING                 /* 멸치쇼핑 이관여부    */
+			, INDEXINGDATE                /* 최종 수정일          */
+			, CANCEL_REASON               /* 취소사유             */
+			, orderfullcontents           /* 주문상세생성시 최초전문  */
+			, apibuyer					  /* 주문자 정보		*/
+			, apishippingid				  /* API 배송번호 */
+		) VALUES (
+			  #{m_ordercd}                       /* 멸치주문코드         */
+			, #{ordercd}                         /* 주문코드             */
+			, #{productcd}::NUMERIC              /* 상품 코드            */
+			, 'TMON'                              /* 사이트명             */
+			, #{detail_no}                       /* 주문상세번호         */
+			, #{sellingprice}::NUMERIC           /* 주문 금액            */
+			, #{supplyprice}::NUMERIC            /* 공급가               */ 
+			, #{qty}::NUMERIC                    /* 주문수량             */
+			, #{amount}::NUMERIC                 /* 상품 판매가          */ 
+			, NULL                               /* 배송 완료일          */ 
+			, #{shippingno}                      /* 운송장 번호          */ 
+			, #{delicomcd}                       /* 택배사 코드          */ 
+			, #{shippingfeetype}                 /* 배송비방식           */ 
+			, #{shippingfee}::NUMERIC            /* 배송비               */
+			, #{shippingmethod}                  /* 배송방법             */
+			, #{shippingpersontel}               /* 배송기사연락처       */
+			, #{shippingfeepaytype}              /* 배송비결제방식       */
+			, #{chargedshippingfee}::NUMERIC     /* 부과된배송비         */
+			, #{import_clearance_orderder1}      /* 개인통관번호         */
+			, #{import_clearance_orderder2}      /* 수입통관 주문자 정보 */  
+			, #{int_deliv_yn}                    /* 국제배송 여부        */
+			, #{int_deliv_stat_cd}               /* 국제배송 상태코드    */ 
+			, #{additionalshippingfee}::NUMERIC  /* 도서산간 추가 배송비 */  
+			, #{status}                          /* 주문상태 값          */   
+			, NOW()                              /* 등록일               */
+			, NOW()                              /* 수정일               */
+			, 'N'                                /* 멸치쇼핑 이관여부    */ 
+			, NOW()                              /* 최종 수정일          */
+			, #{cancel_reason}                   /* 취소사유             */
+			, #{orderfullcontents}               /* 주문상세생성시 최초전문  */
+			, #{apibuyer}						 /* 주문자 정보		*/
+			, #{apishippingid}					 /* API 배송번호 */
+		)
+	</insert>
+
+
+	<!-- 주문상태동기화 수정 -->
+	<update id="updateCommOrderDetailStatusSync" parameterType="hashMap">
+		/* OrderMapper.updateCommOrderDetailStatusSync */
+		UPDATE COMM_ORDER_DETAILS
+		SET MODIFYDATE = NOW()   /* 수정일시 */
+		, INDEXINGDATE = NOW() /* 최종 수정일  */
+
+		<if test="status != null and status != ''">
+			, STATUS     = #{status}  /* 주문상태 값 */
+			, apiindexing = 'N'
+		</if>
+		WHERE ORDERCD   = #{ordercd}::TEXT
+		AND SITENAME  	= #{sitename}
+		AND detail_no   = #{detail_no}::TEXT
+		AND apiindexing != 'U'
+		<if test="status != null and status != ''">
+			AND STATUS != #{status}
+		</if>
+		<if test="productcd != null and productcd != ''">
+			AND PRODUCTCD = #{productcd}::NUMERIC
+		</if>
+
+	</update>
+
+	
+	<!-- 공통주문옵션조회 -->
+	<select id="selectCommOrderDeOpts" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectCommOrderDeOpts */
+		SELECT ORDERCD
+			 , SITENAME	
+			 , PRODUCTCD
+			 , OPTIONSEQ
+			 , DETAIL_NO
+			 , OPTIONPRICE
+			 , QTY
+			 , OPTIONITEM
+		  FROM COMM_ORDER_DE_OPTS
+		 WHERE ORDERCD   = #{ordercd}::TEXT
+		   AND PRODUCTCD = #{productcd}::NUMERIC
+		   AND OPTIONITEM= #{optionitem}::TEXT
+		   AND SITENAME  = 'TMON'
+		<if test="detail_no != null and detail_no != ''">
+		   AND detail_no    = #{detail_no}::TEXT
+		</if> 
+	</select>
+	
+	<!-- 공통주문옵션등록 -->
+	<insert id="insertCommOrderDeOpts" parameterType="hashMap">
+	/* OrderMapper.insertCommOrderDeOpts */
+		INSERT INTO COMM_ORDER_DE_OPTS  
+		(
+			  M_ORDERCD      /* 멸치주문코드       */
+			, SITENAME       /* 사이트명           */
+			, ORDERCD        /* 주문코드           */
+			, PRODUCTCD      /* 상품 코드          */
+			, OPTIONSEQ      /* 옵션그룹핑일련번호 */
+			, DETAIL_NO      /* 주문상세번호      */
+			, OPTIONPRICE    /* 추가금액           */
+			, QTY            /* 주문수량           */
+			, OPTIONITEM     /* 선택옵션           */
+			, APIINDEXING    /* 멸치쇼핑 이관여부    */
+		) VALUES (
+			  #{m_ordercd}
+			, 'TMON'
+			, #{ordercd}
+			, #{productcd}::NUMERIC
+			, (select count(*) from COMM_ORDER_DE_OPTS where M_ORDERCD = #{m_ordercd} and PRODUCTCD = #{productcd}::NUMERIC) + 1
+			, #{detail_no}
+			, #{optionprice}::NUMERIC
+			, #{qty}::NUMERIC
+			, #{optionitem}
+			, 'N'
+		)
+	</insert>
+	
+	<!-- TMON 맵핑정보 조회 -->
+	<select id="selectTmonMappingInfoNew" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectTmonMappingInfoNew */
+		SELECT ordercd
+			 , detail_no
+		  FROM tmon_mapping_info
+		 WHERE m_ordercd = #{m_ordercd}::TEXT
+		   AND ordercd   = #{ordercd}::TEXT
+		   AND detail_no = #{detail_no}::TEXT
+
+	</select>
+	
+	<!-- TMON 맵핑정보 조회 -->
+	<select id="selectTmonMappingInfo" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectTmonMappingInfo */
+		SELECT ordercd
+			 , detail_no	
+			 , deliveryno
+			 , shippingno
+			 , coalesce(to_char(deliverydt,'yyyy-mm-dd'),'') AS deliverydt
+			 , coalesce(claimno,'') AS claimno
+			 , coalesce(claimtype,'') AS claimtype
+			 , coalesce(claimstatus,'') AS claimstatus
+		  FROM tmon_mapping_info
+		 WHERE ordercd   = #{ordercd}::TEXT
+		   AND detail_no = #{detail_no}::TEXT
+	</select>
+	<!-- TMON 맵핑상세정보 조회 -->
+	<select id="selectTmonMappingList" parameterType="hashMap" resultType="hashMap">
+		/* OrderMapper.selectTmonMappingList */
+		SELECT ordercd
+			 , detail_no
+			 , tmondealoptionno
+			 , qty
+		FROM tmon_mapping_list
+		WHERE ordercd   = #{ordercd}::TEXT
+		  AND detail_no = #{detail_no}::TEXT
+	</select>
+
+	<!-- TMON 맵핑정보 카운트 조회 -->
+	<select id="selectTmonMappingInfoCnt" parameterType="hashMap" resultType="hashMap">
+		/* OrderMapper.selectTmonMappingInfoCnt */
+		SELECT COUNT(1) AS cnt
+		FROM tmon_mapping_info a
+		INNER JOIN comm_order_details b on a.ordercd = b.ordercd and a.detail_no = b.detail_no
+		WHERE a.shppno = #{shppNo}::TEXT
+		AND b.status not in ('07')
+		GROUP BY shppno
+	</select>
+	
+	<!-- TMON 맵핑정보 생성 -->
+	<insert id="insertTmonMappingInfo" parameterType="hashMap">
+	/* OrderMapper.insertTmonMappingInfo */
+		INSERT INTO tmon_mapping_info
+		(
+			  m_ordercd
+			, ordercd
+			, detail_no
+			, deliveryno
+			, regdate
+			, modifydate
+			, status
+		) VALUES (
+			  #{m_ordercd}::TEXT
+			, #{ordercd}::TEXT
+			, #{detail_no}::TEXT
+			, #{deliveryno}::TEXT
+			, NOW()
+			, NOW()
+			, '02'
+		)
+	</insert>
+
+	<!-- TMON 맵핑정보 수정 -->
+	<update id="updateTmonMappingInfo" parameterType="hashMap">
+		/* OrderMapper.updateTmonMappingInfo */
+		UPDATE tmon_mapping_info
+			set  modifydate = NOW()
+				<if test="status != null and status != ''">
+					, status = #{status}::TEXT
+				</if>
+				<if test="invoiceNo != null and invoiceNo != ''">
+					, shippingno = #{invoiceNo}::TEXT
+					, deliverydt = NOW()
+				</if>
+				<if test="deliveryNo != null and deliveryNo != ''">
+					, deliveryno = #{deliveryNo}::TEXT
+				</if>
+				<if test="claimstatus != null and claimstatus != ''">
+					, claimstatus = #{claimstatus}::TEXT
+				</if>
+
+
+		<!--<if test="claimshppno != null and claimshppno != ''">
+			, claimshppno = #{claimshppno}::TEXT
+		</if>
+		<if test="claimshppseq != null and claimshppseq != ''">
+			, claimshppseq = #{claimshppseq}::NUMERIC
+		</if>
+		<if test="clmrsncd != null and clmrsncd != ''">
+			, clmrsncd = #{clmrsncd}::TEXT
+		</if>
+		<if test="shppno != null and shppno != ''">
+			, shppno = #{shppno}::TEXT
+		</if>
+		<if test="beforeshppno != null and beforeshppno != ''">
+			, beforeshppno = #{beforeshppno}::TEXT
+		</if>-->
+		WHERE ordercd   = #{ordercd}::TEXT
+			AND detail_no = #{detail_no}::TEXT
+
+	</update>
+
+	<!-- TMON 맵핑정보 카운트 조회 -->
+	<select id="selectTmonMappingListCnt" parameterType="hashMap" resultType="hashMap">
+		/* OrderMapper.selectTmonMappingListCnt */
+		SELECT COUNT(1) AS cnt
+		FROM tmon_mapping_list
+		WHERE m_ordercd   = #{m_ordercd}::TEXT
+		  AND ordercd 	  = #{ordercd}::TEXT
+		  AND detail_no   = #{detail_no}::TEXT
+		  AND tmondealoptionno = #{tmondealoptionno}::numeric
+
+	</select>
+	<!-- TMON 맵핑상세정보  생성 -->
+	<insert id="insertTmonMappingList" parameterType="hashMap">
+		/* OrderMapper.insertTmonMappingList */
+		INSERT INTO tmon_mapping_list
+		(
+		 m_ordercd
+		, ordercd
+		, detail_no
+		, regdate
+		, modifydate
+		, tmondealoptionno
+		, qty
+		, dealoptiontitle
+		) VALUES (
+			 #{m_ordercd}::TEXT
+		 , #{ordercd}::TEXT
+		 , #{detail_no}::TEXT
+		 , NOW()
+		 , NOW()
+		 , #{tmondealoptionno}::numeric
+		 , #{qty}::numeric
+		 , #{optionitem}::TEXT
+				 )
+	</insert>
+	
+	<!-- 주문상세수정 -->
+	<update id="updateCommOrderDetail" parameterType="hashMap">
+	/* OrderMapper.updateCommOrderDetail */
+		UPDATE COMM_ORDER_DETAILS 
+			SET MODIFYDATE = NOW()   /* 수정일시 */
+			  , INDEXINGDATE = NOW() /* 최종 수정일  */
+			  , apiindexing = #{apiindexing}
+			  <if test="status != null and status != ''">
+			  , STATUS     = #{status}  /* 주문상태 값 */
+			  </if>
+		  WHERE ORDERCD   = #{ordercd}::TEXT
+			AND SITENAME  = #{sitename}
+		<if test="productcd != null and productcd != ''">
+			AND PRODUCTCD = #{productcd}::NUMERIC
+		</if>
+		<if test="detail_no != null and detail_no != ''">
+		   AND detail_no    = #{detail_no}::TEXT
+		</if>
+	</update>
+	
+	<!-- 주문상세 배송비 -->
+	<update id="updateCommOrderDetailShippingFee" parameterType="hashMap">
+	/* OrderMapper.updateCommOrderDetailShippingFee */
+		UPDATE COMM_ORDER_DETAILS cod
+			SET MODIFYDATE = NOW()   /* 수정일시 */
+			  , INDEXINGDATE = NOW() /* 최종 수정일  */
+			  , apiindexing = 'N'
+			  , amount = ((select SUM(sellingprice * qty) from COMM_ORDER_DETAILS where cod.ordercd = ordercd and cod.productcd = productcd and cod.m_ordercd = m_ordercd) - #{chargedshippingfee}::NUMERIC)
+			    / (select SUM(QTY) from COMM_ORDER_DETAILS where cod.ordercd = ordercd and cod.productcd = productcd and cod.m_ordercd = m_ordercd) * qty 
+			  , SHIPPINGFEE = #{shippingfee}::NUMERIC
+			  , chargedshippingfee = (#{chargedshippingfee}::NUMERIC + #{additionalshippingfee}::NUMERIC)
+		  WHERE ORDERCD   = #{ordercd}::TEXT
+			AND SITENAME  = #{sitename}
+			AND PRODUCTCD = #{productcd}::NUMERIC
+			<if test="m_ordercd != null and m_ordercd != ''">
+				AND M_ORDERCD = #{m_ordercd}::TEXT /* 멸치주문코드 */
+			</if>
+	</update>
+	
+	<!-- TMON 택백사 코드 조회 -->
+	<select id="selectTmonDelivery" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectTmonDelivery */
+		SELECT deliverycorpcd
+			 , mdeliverycorp
+			 , deliverycorp
+		  FROM tmon_deliverycorp
+		  WHERE mdeliverycorpcd   = #{mdeliverycorp}::TEXT
+		  LIMIT 1
+	</select>
+
+	<!-- 배송완료일 수정 -->
+	<update id="updateShipDate" parameterType="hashMap">
+	/* OrderMapper.updateShipDate */
+		UPDATE COMM_ORDER_DETAILS 
+		   SET MODIFYDATE = NOW()      /* 수정일시 */
+			<if test="status != null and status != ''">
+			 , STATUS        = #{status}     /* 주문상태 값 */
+			</if>
+			
+		<choose>
+			<when test="shipfinisheddate != null and shipfinisheddate != ''">
+				, shipfinisheddate = to_timestamp(substring(#{shipfinisheddate},0,23), 'YYYY-MM-DD HH24:MI:SS.MS')   /* 배송완료일 */
+			</when>
+			<otherwise>
+				, shipfinisheddate = now()
+			</otherwise>
+		</choose>
+			<if test="apiindexing != null and apiindexing != ''">
+			 , apiindexing = #{apiindexing} 
+			 , indexingdate = NOW() 
+			</if>         
+		 WHERE ORDERCD   = #{ordercd}::TEXT   
+		<if test="detail_no != null and detail_no != ''"> 
+		   AND DETAIL_NO = #{detail_no}::TEXT 
+		</if>
+		   AND SITENAME  = #{sitename}
+	</update>
+	
+	<!-- TMON 출고지연 처리 대상건 조회 -->
+	<select id="selectShippingDelay" parameterType="hashMap" resultType="hashMap">
+	/* OrderMapper.selectShippingDelay */
+		SELECT sm.ordercd
+			 , sm.detail_no
+			 , sm.shppno
+			 , sm.shppseq
+			 , sm.shpprsvtdt
+			 , cod.status
+			 , cod.apiindexing
+			 , cod.productcd
+			 , sp.productno
+		  FROM comm_order_details cod  
+			   JOIN tmon_mapping_info sm on cod.ordercd = sm.ordercd
+			   JOIN tmon_products sp on sp.productcd = cod.productcd
+		 WHERE 1=1
+		   AND cod.status = #{status}::TEXT 
+		   AND sm.shpprsvtdt = #{shpprsvtdt}::TEXT
+		   AND cod.apiindexing = 'Y' 
+	</select>
+	
+
+	
+	<select id="selectMapping" parameterType="hashMap" resultType="hashMap">
+		select * 
+		from tmon_mapping_info
+		where ordercd = #{ordercd}::TEXT
+		AND detail_no = #{detail_no}::TEXT
+		and shppno = #{shppNo}::TEXT
+	</select>
+</mapper>

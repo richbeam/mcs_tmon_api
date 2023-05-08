@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CommonMapper">
+          
+    <insert id="insertExceptionLog" parameterType="hashMap">
+    /* CommonMapper."insertExceptionLog" */
+	INSERT INTO test_exception_log 
+	(
+	   sitename
+	 , seq
+	 , request_method
+	 , request_url
+	 , request_param
+	 , request_body
+	 , content	 
+	 , regdate 
+	) VALUES (
+	   #{sitename} 	   
+	 , (SELECT coalesce(max(seq), 0) + 1 FROM test_exception_log WHERE sitename = #{sitename})
+	 , #{request_method}
+	 , #{request_url}
+	 , #{request_param}
+	 , #{request_body}
+	 , #{content}
+	 , NOW() 
+	)   
+    </insert>   
+   
+    <!-- 테스트용 -->  
+    <update id="setDetailStatus" parameterType="hashMap">
+    UPDATE comm_order_details 
+       SET status = #{goalStatusCd}
+         , apiindexing = 'U'
+     WHERE sitename = #{sitename}
+       AND status = #{targetStatusCd} 
+       AND apiindexing = #{targetApiIndexing}
+    </update>	
+</mapper>
+

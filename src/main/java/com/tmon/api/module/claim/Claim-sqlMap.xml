@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ClaimMapper">
+
+	<!-- 멸치 상태별 주문상세목록 조회 -->
+	<select id="selectCommOrderDetail" parameterType="hashMap" resultType="hashMap">
+	/* ClaimMapper.selectCommOrderDetail */
+		SELECT cod.ordercd                    /* 주문코드             */
+			 , cod.m_ordercd                  /* 멸치주문코드        */
+			 , cod.sitename                   /* 사이트명             */
+			 , cod.productcd                  /* 상품 코드            */
+			 , cod.shippingfee                /* 배송비               */
+			 , cod.status                     /* 주문상태 값         */
+			 , cod.detail_no                  /* 주문상세번호        */
+			 , cod.status                      /* 주문상태             */
+			 , cod.qty                        /* 주문수량             */
+			 , cod.shippingmethod             /* 배송방법             */
+			 , cod.shippingno                 /* 운송장 번호          */
+			 , cod.delicomcd                  /* 택배사 코드          */
+			 , cod.cancel_reason              /* 취소사유             */
+			 , sp.productno                   /* 상품아이디           */
+		  FROM comm_order_details cod 
+			   INNER JOIN tmon_products sp ON sp.productcd = cod.productcd
+		 WHERE 1=1
+		   AND cod.sitename = #{sitename}
+		<if test="status != null and status != ''">
+		   AND cod.status = #{status}
+		</if>
+		<if test="apiindexing != null and apiindexing != ''">
+		   AND cod.apiindexing = #{apiindexing}
+		</if>
+		<if test="ordercd != null and ordercd != ''">
+		   AND ORDERCD    = #{ordercd}::TEXT
+		</if>
+		<if test="detail_no != null and detail_no != ''">
+		   AND detail_no    = #{detail_no}::TEXT
+		</if>  
+	</select>
+	
+	<!-- 주문상세조회 배송비이관대상가져오기 -->
+	<select id="selectCommOrderDetailShip" parameterType="hashMap" resultType="hashMap">
+	/* ClaimMapper.selectCommOrderDetailShip */
+		SELECT *
+		  FROM COMM_ORDER_DETAILS
+		 WHERE 1 = 1
+		   AND SITENAME  = #{sitename}  
+		   AND M_ORDERCD = #{m_ordercd}::TEXT
+		<![CDATA[ 
+		   AND ORDERCD   > #{ordercd}::TEXT
+		]]>
+	  ORDER BY ORDERCD ASC
+		 LIMIT 1
+	</select>
+	
+	<!-- 주문상세수정 -->
+	<update id="updateCommOrderDetail" parameterType="hashMap">
+	/* ClaimMapper.updateCommOrderDetail */
+		UPDATE COMM_ORDER_DETAILS 
+		   SET MODIFYDATE = NOW()   /* 수정일시 */
+			 , INDEXINGDATE = NOW() /* 최종 수정일  */
+			<if test="status != null and status != ''">
+			 , STATUS     = #{status}  /* 주문상태 값 */
+			</if>
+			<if test="qty != null and qty != ''">
+			 , QTY        = #{qty}::NUMERIC     /* 수량 */
+			</if>
+			<if test="shipfinisheddate != null and shipfinisheddate != ''">
+			 , SHIPFINISHEDDATE = to_timestamp(#{shipfinisheddate}, 'YYYY-MM-DD HH24:MI:SS.MS') /* 배송완료처리일 */            
+			</if>
+			<if test="shippingno != null and shippingno != ''">
+			 , SHIPPINGNO = #{shippingno} /* 운송장 번호 */
+			</if>
+			<if test="delicomcd != null and delicomcd != ''">
+			 , DELICOMCD = #{delicomcd}   /* 택배사 코드 */
+			</if>
+			<if test="shippingfeetype != null and shippingfeetype != ''">
+			 , SHIPPINGFEETYPE = #{shippingfeetype}   /* 배송비방식 */
+			</if>
+			<if test="shippingfee != null and shippingfee != ''">
+			 , SHIPPINGFEE = #{shippingfee}::NUMERIC   /* 배송비 */
+			</if>
+			<if test="shippingmethod != null and shippingmethod != ''">
+			 , SHIPPINGMETHOD = #{shippingmethod}   /* 배송방법 */
+			</if>
+			<if test="shippingfeepaytype != null and shippingfeepaytype != ''">
+			 , SHIPPINGFEEPAYTYPE = #{shippingfeepaytype}   /* 배송비결제방식 */
+			</if>
+			<if test="chargedshippingfee != null and chargedshippingfee != ''">
+			 , CHARGEDSHIPPINGFEE = #{chargedshippingfee}::NUMERIC   /* 부과된배송비 */
+			</if>
+			<if test="cancelReason != null and cancelReason != ''">
+			 , CANCEL_REASON = #{cancelReason}   /* 취소사유 */
+			</if>
+			<if test="apiindexing != null and apiindexing != ''">
+			 , APIINDEXING = #{apiindexing}   /* 멸치쇼핑 이관여부 */
+			</if>
+			<if test="amount != null and amount != ''">
+			 , AMOUNT = #{amount}   /* 상품 실 주문 금액 */
+			</if>
+		 WHERE ORDERCD   = #{ordercd}::TEXT
+		   AND SITENAME  = #{sitename}
+		<if test="productcd != null and productcd != ''">
+		   AND PRODUCTCD = #{productcd}::NUMERIC
+		</if>
+		<if test="detail_no != null and detail_no != ''">
+		   AND detail_no    = #{detail_no}::TEXT
+		</if>
+	</update>
+	
+	<!-- 변경테이블조회 -->
+	<select id="selectCommOrderChange" resultType="hashMap">   
+	/* ClaimMapper.selectCommOrderChange */ 
+		SELECT *
+		  FROM COMM_ORDER_CHANGE
+		 WHERE M_ORDERCD = #{m_ordercd}::TEXT
+		   AND ORDERCD   = #{ordercd}::TEXT
+		   AND PRODUCTCD = #{productcd}::NUMERIC
+		   <if test="apistatuscd != null and apistatuscd != ''">
+		   	AND APISTATUSCD = #{apistatuscd}::NUMERIC
+		   </if>
+	</select>
+	
+	<!-- 변경테이블입력 -->
+	<insert id="insertCommOrderChange" parameterType="hashMap">
+	/* ClaimMapper.insertCommOrderChange */ 
+		INSERT INTO COMM_ORDER_CHANGE 
+		(
+			  M_ORDERCD
+			, ORDERCD
+			, PRODUCTCD
+			, SEQ
+			, STATUSCD
+			, APISTATUSCD
+			, REASON
+			, DELICOMCD
+			, SHIPPINGNO
+			, REGDATE
+			, SITENAME
+			, APIINDEXING
+			, INDEXINGDATE
+		) VALUES ( 
+			  #{m_ordercd}::TEXT
+			, #{ordercd}::TEXT 
+			, #{productcd}::NUMERIC
+			, (SELECT coalesce(max(seq), 0) + 1 FROM comm_order_change WHERE m_ordercd = #{m_ordercd}::TEXT)
+			, #{statuscd} 
+			, #{apistatuscd}::NUMERIC
+			, #{reason}
+			, #{delicomcd}
+			, #{shippingno}
+			, now()
+			, #{sitename}
+			, 'N'
+			, now()
+		)
+	</insert>
+	
+	<!-- 변경테이블수정 -->
+	<update id="updateCommOrderChange" parameterType="hashMap">
+	/* ClaimMapper.updateCommOrderChange */ 
+		UPDATE PUBLIC.COMM_ORDER_CHANGE
+		   SET INDEXINGDATE = NOW()
+			 , SITENAME     = #{sitename}
+			<if test="statuscd != null and statuscd != ''">
+			 , STATUSCD     = #{statuscd}
+			</if>
+			<if test="apistatuscd != null and apistatuscd != ''">
+			 , APISTATUSCD  = #{apistatuscd}::NUMERIC
+			</if>
+			<if test="reason != null and reason != ''">
+			 , REASON       = #{reason}
+			</if>
+			<if test="banktype != null and banktype != ''">
+			 , BANKTYPE     = #{banktype}
+			</if>
+			<if test="accountnum != null and accountnum != ''">
+			 , ACCOUNTNUM   = #{accountnum}
+			</if>
+			<if test="depositor != null and depositor != ''">
+			 , DEPOSITOR    = #{depositor}
+			</if>
+			<if test="delicomcd != null and delicomcd != ''">
+			 , DELICOMCD    = #{delicomcd}
+			</if>
+			<if test="shippingno != null and shippingno != ''">
+			 , SHIPPINGNO   = #{shippingno}
+			</if>
+			<if test="apiindexing != null and apiindexing != ''">
+			 , APIINDEXING  = #{apiindexing}
+			</if>
+		 WHERE ORDERCD = #{ordercd}
+		   AND SEQ = #{seq}::NUMERIC  
+		   AND PRODUCTCD = #{productcd}::NUMERIC
+	</update>
+
+	<!-- Tmon 맵핑정보 조회 -->
+	<select id="selectTmonMappingClaimInfo" parameterType="hashMap" resultType="hashMap">
+		/* ClaimMapper.selectTmonMappingClaimInfo */
+		SELECT m_ordercd
+		     , ordercd
+			 , detail_no
+		     , deliveryno
+			 , coalesce(claimno,'') AS claimno
+			 , claimtype
+			 , claimstatus
+			 , claimdealoptions
+			 , requestreason
+		FROM tmon_mapping_info
+		WHERE ordercd   = #{ordercd}::TEXT
+		  AND detail_no = #{detail_no}::TEXT
+	</select>
+
+	<!-- Tmon 맵핑정보 조회 -->
+	<select id="selectTmonMappingInfo" parameterType="hashMap" resultType="hashMap">
+	/* ClaimMapper.selectTmonMappingInfo */
+		SELECT m_ordercd
+		     , ordercd
+			 , detail_no
+			 , deliveryno
+			 , coalesce(claimno,'') AS claimno
+			 , claimtype
+			 , claimstatus
+			 , claimdealoptions
+			 , requestreason
+		  FROM tmon_mapping_info
+		 WHERE ordercd   = #{ordercd}::TEXT
+		   AND detail_no = #{detail_no}::TEXT
+	</select>
+
+	<!-- Tmon 맵핑정보 조회 -->
+	<select id="selectTmonMappingList" parameterType="hashMap" resultType="hashMap">
+		/* ClaimMapper.selectTmonMappingInfo */
+		SELECT m_ordercd
+			 , ordercd
+			 , detail_no
+			 , tmondealoptionno
+			 , qty
+			 , dealoptiontitle
+		FROM tmon_mapping_list
+		WHERE ordercd   = #{ordercd}::TEXT
+		  AND detail_no = #{detail_no}::TEXT
+	</select>
+	
+
+
+	<!-- Tmon 맵핑정보 수정 -->
+	<update id="updateTmonMappingInfo" parameterType="hashMap">
+		/* ClaimMapper.updateTmonMappingInfo */
+		UPDATE tmon_mapping_info
+		SET status = #{status}::TEXT
+		<if test="shippingno != null and shippingno != ''">
+			, shippingno = #{shippingno}::TEXT
+			, deliverydt = NOW()
+		</if>
+		<if test="claimno != null and claimno != ''">
+			, claimno = #{claimno}::TEXT
+		</if>
+		<if test="claimtype != null and claimtype != ''">
+			, claimtype = #{claimtype}::TEXT
+		</if>
+		<if test="claimstatus != null and claimstatus != ''">
+			, claimstatus = #{claimstatus}::TEXT
+		</if>
+		<if test="claimdealoptions != null and claimdealoptions != ''">
+			, claimdealoptions = #{claimdealoptions}::TEXT
+		</if>
+		<if test="requestreason != null and requestreason != ''">
+			, requestreason = #{requestreason}::TEXT
+		</if>
+		, modifydate = NOW()
+		WHERE ordercd = #{ordercd}::TEXT
+		AND detail_no = #{detail_no}::TEXT
+	</update>
+
+	<!-- Tmon 맵핑히스토리 조회 -->
+	<select id="selectTmonMappingHistory" parameterType="hashMap" resultType="hashMap">
+		/* ClaimMapper.selectTmonMappingHistory */
+		SELECT ordercd
+			 , detail_no
+			 , claimno
+			 , claimtype
+			 , claimstatus
+			 , requestreason
+		FROM tmon_mapping_history
+		WHERE ordercd   = #{ordercd}::TEXT
+		  AND detail_no = #{detail_no}::TEXT
+		  AND claimno   = #{claimno}::TEXT
+		LIMIT 1
+	</select>
+	
+	<!-- Tmon 맵핑히스토리 저장 -->
+	<insert id="insertTmonMappingHistory" parameterType="hashMap">
+	/* ClaimMapper.insertTmonMappingHistory */
+		INSERT INTO tmon_mapping_history
+		(
+		 	  m_ordercd
+			, ordercd
+			, detail_no
+			, claimno
+			, claimtype
+			, claimstatus
+			, claimdealoptions
+			, requestreason
+			, regdate
+			, modifydate
+		) VALUES (
+			  #{m_ordercd}::TEXT
+			, #{ordercd}::TEXT
+			, #{detail_no}::TEXT
+			, #{claimno}::TEXT
+			, #{claimtype}::TEXT
+			, #{claimstatus}::TEXT
+			, #{claimdealoptions}::TEXT
+			, #{requestreason}::TEXT
+			, NOW()
+			, NOW()
+		)
+	</insert>
+	
+
+	
+	<!-- Tmon 택백사 코드 조회 -->
+	<select id="selectTmonDelivery" parameterType="hashMap">
+	/* ClaimMapper.selectTmonDelivery */
+		SELECT deliverycorpcd
+			 , mdeliverycorp
+			 , deliverycorp
+		FROM tmon_deliverycorp
+		WHERE mdeliverycorpcd   = #{mdeliverycorp}::TEXT
+		LIMIT 1
+	</select>
+
+
+	<!-- 교환건 완료 처리 -->
+	<update id="commOrderDetailIndexingY" parameterType="hashMap">
+		/* ClaimMapper.commOrderDetailIndexingY */
+		UPDATE comm_order_details
+		SET   INDEXINGDATE = NOW()
+			, APIINDEXING     = 'Y'
+		WHERE sitename = #{sitename}
+		AND status = #{status}
+        AND apiindexing = 'U'
+	</update>
+</mapper>

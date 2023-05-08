@@ -1,0 +1,837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ProdMapper">
+
+
+	<!-- TMON 배송지 등록 -->
+	<insert id="insertTmonAddress" parameterType="hashMap">
+		/* ProdMapper.insertTmonAddress */
+			INSERT INTO tmon_address
+		(
+		  	sellercd, no, partnerNo, type, addressName, defaultAddress, zipcode, address, addressDetail, streetAddress, managerName, managerPhone, available, regdate, modifydate
+		) VALUES (
+		 	#{sellercd}::NUMERIC, #{no}, #{partnerNo}, #{type}, #{addressName}, false, #{zipCode}, #{address}, #{addressDetail}, #{streetAddress}, #{managerName}, #{managerPhone}, true, now(), now()
+		)
+	</insert>
+
+	<!-- TMON 배송지 수정 -->
+	<update id="updateTmonAddress" parameterType="hashMap">
+		/* ProdMapper.updateTmonAddress */
+		UPDATE tmon_address
+		SET modifydate = now()
+			,addressName	= #{addressName}
+			,zipCode    	= #{zipCode}
+			,address		= #{address}
+			,addressDetail 	= #{addressDetail}
+		WHERE no = #{no}::NUMERIC
+	</update>
+
+
+    <!-- tmon 배송지 조회 -->
+    <select id="selectTmonAddress" parameterType="hashMap" resultType="hashMap">
+        SELECT
+                addressName,
+                defaultAddress,
+                zipcode,
+                address,
+                addressdetail,
+                streetaddress,
+                managerName,
+                managerPhone,
+                available,
+                no,
+                partnerNo,
+                regdate,
+                modifydate
+        FROM tmon_address
+        WHERE sellercd = #{sellercd}::numeric
+        and   type     = #{type}
+    </select>
+
+	<!-- TMON 배송템플릿 등록 -->
+	<insert id="insertTmonDeliveryTemplate" parameterType="hashMap">
+	/* ProdMapper.insertTmonDeliveryTemplate */
+		INSERT INTO tmon_deliverytemplate
+		(
+		  	sellercd, deliveryTemplateName , deliverytemplateno, bundledDeliveryAble ,deliveryFeePolicy ,deliveryFee ,deliveryFeeFreePrice ,productType ,deliveryType ,ddayDeliveryTime ,longDistanceDeliveryAvailable ,longDistanceDeliveryPrepay ,longDistanceDeliveryFeeJeju ,longDistanceDeliveryFeeExcludingJeju ,partnerDeliveryAddressNo ,partnerReturnAddressNo ,regdate,modifydate
+		) VALUES (
+		 	#{sellercd}::NUMERIC, #{deliveryTemplateName}, #{deliveryTemplateNo	}, #{bundledDeliveryAble},#{deliveryFeePolicy},#{deliveryFee},#{deliveryFeeFreePrice},#{productType},#{deliveryType},#{ddayDeliveryTime},#{longDistanceDeliveryAvailable},#{longDistanceDeliveryPrepay},#{longDistanceDeliveryFeeJeju},#{longDistanceDeliveryFeeExcludingJeju},#{partnerDeliveryAddressNo},#{partnerReturnAddressNo},now(),now()
+		)
+	</insert>
+
+	<!-- TMON 배송템플릿 조회 -->
+	<select id="selectTmonDeliveryTemplate" parameterType="hashMap" resultType="hashMap">
+        SELECT
+                deliverytemplateno
+        FROM tmon_deliverytemplate
+        WHERE deliverytemplatename = #{deliveryTemplateName}
+    </select>
+
+	<!-- tmon 고시정보 조회 -->
+	<select id="selectTmonNoti" parameterType="hashMap" resultType="hashMap">
+		SELECT  tnotigroupname
+				,notiname
+		FROM tmon_product_noti
+		WHERE notigroupcd = #{notigroupcd}
+	</select>
+
+    <!-- TMON 상품등록 대상 목록 조회 -->
+	<select id="selectNewProducts" parameterType="hashMap" resultType="hashMap"> 
+	/* ProdMapper.selectNewProducts */
+		SELECT cp.productcd
+			 , cp.sellercd
+		     , coalesce(td.deliverycorp,'직접배송') AS deliverycorp
+			 , 'N' AS tmon
+		  FROM comm_sellers cs
+		  INNER JOIN comm_products cp
+			 ON cp.sellercd = cs.sellercd
+			 AND cp.productcd in ('72809064','72809149','72809361','72809373','72809332','72809389','52620547')
+			<if test="productCd != null and productCd != ''">
+				AND cp.productcd = #{productCd}::NUMERIC
+			</if>
+			AND cs.tmon IN ('Y', 'R')
+			AND cp.tmon = 'N'						/* N : 신규 */
+			AND cp.status = '02'					/* STATUS 02 : 판매중 */
+			AND cs.seller_type_cd='10'				/* seller_type_cd  : 10:사업자 판매회원, 20:글로벌 판매회원(해외사업자) */
+			AND cs.OVERSEAS_GOODS_SALES_YN ='N'		/* OVERSEAS_GOODS_SALES_YN : Y:해외배송,N:국내배송 */
+		  LEFT JOIN tmon_deliverycorp td on cs.shippingcompanycd = td.mdeliverycorpcd::NUMERIC
+		  /*INNER JOIN tmon_categories sc
+		 	 ON sc.catecd = cp.catecd
+		  INNER JOIN COMM_CATEGORIES cc4 ON  cp.cateCd = cc4.cateCd
+		  INNER JOIN COMM_CATEGORIES cc3 ON  cc3.cateCd = cc4.refCateCd
+		  INNER JOIN COMM_CATEGORIES cc2 ON  cc2.cateCd = cc3.refCateCd
+		  INNER JOIN COMM_CATEGORIES cc1 ON  cc1.cateCd = cc2.refCateCd and cc1.cateCd not in (7,8)*/
+		 WHERE 1=1
+		   AND NOT EXISTS(select 1 from tmon_products where productcd = cp.productcd )
+		   AND cp.productname not like '%로얄%'
+		   AND cp.overseas_goods_sales_yn = 'N'
+		   /*AND cc2.cateCd != '45'
+		   AND ( cp.isusedproductoption = 0 
+				  OR (cp.ISUSEDPRODUCTOPTION IN (1,2) AND cp.productcd NOT IN (
+						SELECT productcd
+						  FROM comm_product_opts sub 
+						 WHERE cp.productcd = sub.productcd 
+						   AND sub.ISAVA = '02'
+						   AND (sub.OPTIONGROUPNO != 1
+								OR sub.optionprice > 0
+								)
+						 LIMIT 1
+					 ))
+				)
+		   AND ((cp.shippingfee = 0 OR cp.shippingfee IS NULL) OR (cp.shippingfee > 0 AND cp.supplyprice >= 7000))
+		   AND cp.shippingfeepaytype != '03'*/
+		   ORDER BY cp.productcd DESC
+		   LIMIT 200 OFFSET 0
+	</select>
+	
+	<!-- TMON 상품수정 대상 목록 조회 -->
+	<select id="selectUpdatedProducts" parameterType="hashMap" resultType="hashMap" fetchSize="1000">
+	/* ProdMapper.selectUpdatedProducts */
+		SELECT cp.productcd
+			 , cp.sellercd
+		     , cp.status
+		     , coalesce(td.deliverycorp,'직접배송') AS deliverycorp
+			 , cp.tmon
+			 , coalesce((select max(optiongroupno) from comm_product_opts where productcd = cp.productcd and isava in ('02','03')),1) AS optgroupcnt
+		  FROM comm_sellers cs
+			   INNER JOIN comm_products cp
+				 ON cp.sellercd = cs.sellercd
+				 AND cp.productcd in ('72809064','72809149','72809361','72809373','72809332','72809389','52620547')
+				<if test="productCd != null and productCd != ''">
+					AND cp.productcd = #{productCd}::NUMERIC
+				</if>
+				--AND (cp.shippingfee = 0  OR (cp.shippingfee > 0 AND cp.supplyprice >= 7000))
+				AND cs.tmon IN ('Y', 'R')
+				AND cp.tmon = 'U'						/* N : 수정 */
+				AND cs.seller_type_cd='10'				/* seller_type_cd  : 10:사업자 판매회원, 20:글로벌 판매회원(해외사업자) */
+				AND cs.OVERSEAS_GOODS_SALES_YN ='N'		/* OVERSEAS_GOODS_SALES_YN : Y:해외배송,N:국내배송 */
+			   LEFT JOIN tmon_deliverycorp td on cs.shippingcompanycd = td.mdeliverycorpcd::NUMERIC
+			  --INNER JOIN tmon_categories sc
+			  --	 ON sc.catecd = cp.catecd
+			  --	AND sc.api_YN ='Y'
+		 WHERE 1=1
+		 AND EXISTS(select 1 from tmon_products where productcd = cp.productcd )
+		   <!-- AND cs.sellercd in (select sellercd from tmon_sellers) -->
+		  /* AND ( cp.isusedproductoption = 0
+				  OR (cp.ISUSEDPRODUCTOPTION IN (1,2) AND cp.productcd NOT IN (
+						SELECT productcd
+						  FROM comm_product_opts sub
+						 WHERE cp.productcd = sub.productcd
+						   AND sub.ISAVA = '02'
+						   AND (sub.OPTIONGROUPNO != 1
+								OR sub.optionprice > 0
+								)
+						 LIMIT 1
+					 ))
+				)
+		   AND cp.shippingfeepaytype != '03'*/
+			  LIMIT 1000 OFFSET 0
+	</select>
+	
+	<!-- TMON 상품금액수정(재고, 가격, 상태변경)건 조회 -->
+	<select id="selectProductsChange" parameterType="hashMap" resultType="hashMap" fetchSize="500">
+	/* ProdMapper.selectProductsChange */
+		WITH WITH_TABUP AS (
+			WITH  WITH_TAB AS (
+				SELECT p.productcd
+					 , p.tmon as tmon2
+					 , 'price' as gubun
+				  FROM comm_products_price_change p
+					   INNER JOIN comm_sellers s ON p.sellercd = s.sellercd and (s.tmon = 'Y' or s.tmon = 'R')
+				 WHERE p.tmon = 'U'
+				 UNION 
+				SELECT p.productcd
+					 , p.tmon as tmon2
+					 , 'qty' as gubun
+				  FROM comm_products_qty_change p
+					   INNER JOIN comm_sellers s on p.sellercd = s.sellercd and (s.tmon = 'Y' or s.tmon = 'R')
+				 WHERE p.tmon = 'U'
+				 UNION
+				SELECT p.productcd
+					 , p.tmon as tmon1
+					 , 'status' as gubun
+				  FROM comm_products_status_change p
+					   INNER JOIN comm_sellers s on p.sellercd = s.sellercd and (s.tmon = 'Y' or s.tmon = 'R')
+				 WHERE p.tmon = 'U'
+			)
+			SELECT cp.*
+				 , wt.tmon2
+				 , wt.gubun
+			  FROM comm_products cp, WITH_TAB wt
+			 WHERE cp.productcd = wt.productcd
+			   AND cp.api_yn = 'Y'
+			   AND ((cp.shippingfee = 0 OR cp.shippingfee IS NULL) OR (cp.shippingfee > 0 AND cp.supplyprice >= 7000))
+		)
+		SELECT sp.productno
+			 , wu.productcd
+			 , wu.sellingprice
+			 , wu.prdqty
+			 , wu.status
+			 , wu.tmon2
+			 , string_agg(DISTINCT wu.gubun, ',') as gubun
+		  FROM tmon_products sp, WITH_TABUP wu
+		 WHERE sp.productcd = wu.productcd
+	  GROUP BY sp.productno, wu.productcd, wu.sellingprice, wu.prdqty, wu.status, wu.tmon2
+		 limit 500
+	</select>
+
+
+
+	<!-- TMON 카테고리 조회 -->
+	<select id="selectCategory" parameterType="hashMap" resultType="hashMap">
+		/* ProdMapper.selectCategory */
+		SELECT
+			   tmoncatecd
+			 , tmoncatenm
+		FROM tmon_categories
+		WHERE catecd = #{catecd}::NUMERIC
+		LIMIT 1
+	</select>
+
+	
+	<!-- 셀러 판매/품절 대상 조회 -->
+	<select id="selectModifiedSellerProduct" parameterType="hashMap" resultType="hashMap"> 
+	/* ProdMapper.selectModifiedSellerProduct */
+		WITH WITH_TABUP AS (
+			WITH  WITH_TAB AS (
+				SELECT sellercd
+					 , tmon as sellertmon
+				  FROM comm_sellers 
+				 WHERE tmon IN ('D','R') 
+				   AND shippingcompanycd is not null 
+				   AND returnaddress1 is not null
+			)
+			SELECT B.*
+				 , A.*
+			  FROM comm_products A
+				 , with_tab B
+			 WHERE A.sellercd = B.sellercd
+			   AND A.api_yn = 'Y'
+			   AND ((A.shippingfee = 0 OR A.shippingfee IS NULL) OR (A.shippingfee > 0 AND A.supplyprice >= 7000))
+		)
+		SELECT C.productno
+			 , D.* 
+		  FROM tmon_products C
+			 , with_tabup D
+		 WHERE C.productcd = D.productcd
+		   AND coalesce(D.sellertmon,'') != coalesce(C.tmon,'')
+		 limit 200
+	</select>
+	
+	<!-- 셀러 상품삭제건 조회 -->
+	<select id="selectDeletedSellerProduct" parameterType="hashMap" resultType="hashMap">
+	/* ProdMapper.selectDeletedSellerProduct */
+		WITH WITH_TABUP AS (
+			WITH  WITH_TAB AS (
+				SELECT sellercd
+					 , 'D' as sellertmon
+				  FROM comm_sellers 
+				 WHERE tmon IN ('Y','R') 
+				   and shippingcompanycd is not null 
+				   and returnaddress1 is not null
+			)
+			SELECT B.*
+				 , A.*
+			  FROM comm_products A
+				 , with_tab B
+			 WHERE A.sellercd = B.sellercd
+			   AND A.status in ('01','03','04')
+		)
+		SELECT C.productno
+			 , C.tmon
+			 , D.* 
+		  FROM tmon_products C
+			 , with_tabup D
+		 WHERE C.productcd = D.productcd
+		   AND coalesce(D.sellertmon,'') != coalesce(C.tmon,'')
+		 limit 200
+	</select>
+
+	<!-- 멸치 상품 조회 -->
+	<select id="selectProducts" parameterType="hashMap" resultType="hashMap"> 
+		/* ProdMapper.selectProducts */
+		SELECT *
+		  FROM comm_products
+		 WHERE productcd = #{productcd}::NUMERIC
+	</select>
+
+	<!-- 멸치 상품옵션 그룹(section)정보 조회 -->
+	<select id="selectCommProductOptGroup" parameterType="hashMap" resultType="hashMap">
+	/* ProdMapper.selectCommProductOptGroup */
+			SELECT optiongroupno
+				 , optiongroupname
+			  FROM comm_product_opts cpo
+			 WHERE productcd = #{productcd}::NUMERIC
+			   AND isava in ('02','03')
+			GROUP BY optiongroupno ,optiongroupname
+			ORDER by 1
+	</select>
+
+	<!-- 멸치 상품등록시 옵션 정보 조회 -->
+	<select id="selectCommProductOpts" parameterType="hashMap" resultType="hashMap">
+	/* ProdMapper.selectCommProductOpts */
+			SELECT productoptioncd
+				 , optiongroupno
+				 , optiongroupname
+				 , coalesce(optionitem,'') AS optionitem
+				 , coalesce(' '||optionitemdetail,'') AS optionitemdetail
+				 , coalesce(optionprice,0) as optionprice
+				 , coalesce(optionqty, 999) AS optionqty
+				 , isava as isava
+			  FROM comm_product_opts cpo
+			 WHERE productcd = #{productcd}::NUMERIC
+			   AND isava in ('02','03')
+			ORDER by optiongroupno,productoptioncd,optionitem
+	</select>
+	<!-- 멸치 상품수정시 옵션 정보 조회 -->
+	<select id="selectCommProductEditOpts" parameterType="hashMap" resultType="hashMap">
+		/* ProdMapper.selectCommProductEditOpts */
+		SELECT cpo.productoptioncd
+			 , cpo.optiongroupno
+			 , cpo.optiongroupname
+			 , coalesce(cpo.optionitem,'') AS optionitem
+			 , coalesce(' '||cpo.optionitemdetail,'') AS optionitemdetail
+			 , coalesce(cpo.optionprice,0) as optionprice
+			 , coalesce(cpo.optionqty, 999) AS optionqty
+			 , cpo.isava as isava
+		FROM comm_product_opts cpo
+		inner join tmon_product_opt tpo
+		  on   tpo.productcd = cpo.productcd
+		  and  tpo.productoptioncd  like cast(cpo.productoptioncd as text)||'%'
+		WHERE cpo.productcd = #{productcd}::NUMERIC
+		ORDER by cpo.optiongroupno,cpo.productoptioncd,cpo.optionitem
+	</select>
+
+	<!-- TMON 브랜드 조회 -->
+	<select id="selectBrands" parameterType="hashMap" resultType="hashMap">
+		SELECT brandcd
+			 , brandname
+			 , tmonbrandcd
+		  FROM tmon_brands 
+		 WHERE brandcd = #{brandcd}::NUMERIC
+		 limit 1
+	</select>
+	
+	<!-- TMON 상품 목록 조회 -->
+	<select id="selectTmonProducts" parameterType="hashMap" resultType="hashMap"> 
+	/* ProdMapper.selectTmonProducts */
+		SELECT *
+		  FROM tmon_products
+		 WHERE 1=1
+		 <if test="productcd != null and productcd != ''">
+		   AND productcd = #{productcd}::NUMERIC
+		 </if>
+		 <if test="productno != null and productno != ''">
+		   AND productno = #{productno}::NUMERIC
+		 </if>
+	</select>
+	
+	<!-- TMON 상품 수정 -->
+	<update id="updateTmonProducts" parameterType="hashMap">
+	/* ProdMapper.updateTmonProducts */
+		UPDATE tmon_products
+		   SET modifydate = now()
+		   <if test="tmon != null and tmon != ''">
+		     , tmon = #{tmon}
+		   </if>
+		   <if test="supplyprice != null and supplyprice != ''">
+		     , supplyprice = #{supplyprice}::NUMERIC
+		   </if>
+		 WHERE productcd = #{productcd}::NUMERIC
+	</update>
+	
+	<!-- TMON 업체 배송비 정책 조회 -->
+	<select id="selectTmonShippingPolicy" parameterType="hashMap" resultType="hashMap"> 
+	/* ProdMapper.selectTmonShippingPolicy */
+		SELECT shppcstid as shppcstid
+		  FROM tmon_shipping_policy 
+		 WHERE shppcstplcydivcd = #{shppcstPlcyDivCd}
+		   AND shppcstaplunitcd = #{shppcstAplUnitCd}
+		   AND prpaycoddivcd = #{prpayCodDivCd}
+		   AND shppcst = #{shppcst}::NUMERIC
+		<choose>
+			<when test="shppcstExmpCritnAmt != null and shppcstExmpCritnAmt != ''">
+				AND shppcstexmpcritnamt = #{shppcstExmpCritnAmt}::NUMERIC
+			</when>
+			<otherwise>
+				AND shppcstexmpcritnamt IS NULL
+			</otherwise>
+		</choose>
+		 LIMIT 1	
+	</select>
+	
+	<!-- TMON 업체 배송비 정책 조회 -->
+	<insert id="insertTmonShippingPolicy" parameterType="hashMap">
+	/* ProdMapper."insertTmonShippingPolicy" */
+		INSERT INTO tmon_shipping_policy
+		(
+		  shppcstid 
+		, shppcstplcydivcd
+		, shppcstaplunitcd
+		, prpaycoddivcd
+		, shppcstexmpcritnamt
+		, shppcst
+		, regdate
+		) VALUES (
+		  #{shppcstId}
+		, #{shppcstPlcyDivCd}
+		, #{shppcstAplUnitCd}
+		, #{prpayCodDivCd}
+		, #{shppcstExmpCritnAmt}
+		, #{shppcst}  
+		, now()
+		)
+	</insert>
+	
+	<!-- 멸치 판매자 정보 조회 -->
+	<select id="selectSeller" parameterType="hashMap" resultType="hashMap"> 
+	/* ProdMapper.selectSeller */
+		SELECT sellercd
+			 , ebay as sebay
+			 , sellerid
+			 , entertype
+			 , businame
+			 , businum
+			 , busitype
+			 , busicate
+			 , postcode1
+			 , COALESCE(postcode2,'') AS postcode2
+			 , address1
+			 , address2
+			 , returnpostcode1
+			 , COALESCE(returnpostcode2,'') AS returnpostcode2
+			 , returnaddress1
+			 , returnaddress2
+			 , shippingtype
+			 , shippingcompanycd
+			 , seller_type_cd
+			 , tel
+			 , phonenumber
+			 , COALESCE(notice_img,'N') AS noticeimg
+			 , notice_name AS noticename
+		  FROM comm_sellers 
+		 WHERE sellercd =  #{sellercd}::NUMERIC 
+		   AND returnaddress1 is not null
+	</select>
+	
+	<!-- tmon 배송정책 조회 -->
+	<select id="selectTmonDeliveryPolicy" parameterType="hashMap" resultType="hashMap"> 
+		SELECT doroaddrid
+			 , jibunaddrid
+			 , grpaddrid
+			 , sellercd
+			 , zipcd
+			 , addrlcantnm
+			 , addrbasc
+			 , addrdtl 
+			 , cnts
+		 FROM tmon_delivery_policy
+		WHERE sellercd =  #{sellercd}::NUMERIC
+		  AND zipcd = #{zipcd}
+		  AND gubuncd = #{gubuncd}
+		LIMIT 1
+	</select>
+	
+	<!-- tmon 배송정책 등록 -->
+	<insert id="insertTmonDeliveryPolicy" parameterType="hashMap">
+	/* ProdMapper.insertTmonDeliveryPolicy */
+		INSERT INTO tmon_delivery_policy
+		(
+		  grpaddrid 
+		, doroaddrid
+		, jibunaddrid
+		, gubuncd
+		, sellercd
+		, zipcd
+		, addrlcantnm
+	 	, addrbasc
+	 	, addrdtl 
+	 	, cnts
+		, regdate
+		, modifydate
+		) VALUES (
+		  #{grpaddrid}
+		, #{doroaddrid}
+		, #{jibunaddrid}
+		, #{gubuncd}
+		, #{sellercd}::NUMERIC
+		, #{zipcd}
+		, #{addrlcantnm}
+		, #{addrbasc}
+		, #{addrdtl}
+		, #{cnts}
+		, now()
+		, now()
+		)
+	</insert>
+	
+	<update id="updateTmonDeliveryPolicy" parameterType="hashMap">
+	/* ProdMapper.updateTmonDeliveryPolicy */
+		UPDATE tmon_delivery_policy
+			SET grpaddrid = #{grpaddrid}
+			  , doroaddrid = #{doroaddrid}
+			  , jibunaddrid = #{jibunaddrid}
+			  , addrlcantnm = #{addrlcantnm}
+	 		  , addrbasc = #{addrbasc}
+	 		  , addrdtl = #{addrdtl}
+	 		  , cnts = #{cnts}
+			  , modifydate = now()
+		  WHERE sellercd =  #{sellercd}::NUMERIC
+			AND zipcd = #{zipcd}
+			AND gubuncd = #{gubuncd}
+	</update>
+	
+
+		
+	<!-- tmon 상품등록 -->
+	<insert id="insertTmonProducts" parameterType="hashMap">
+	/* ProdMapper.insertTmonProduct */
+		INSERT INTO tmon_products  
+		(
+			 productno
+			, productcd
+			, regdate
+			, modifydate
+			, supplyprice
+			, optgroupcnt
+		) VALUES (
+			  #{productno}::NUMERIC
+			, #{productcd}::NUMERIC
+			, now()
+			, now()
+			, #{supplyprice}::NUMERIC
+			, #{optgroupcnt}::NUMERIC
+		)
+	</insert>
+
+	<!-- tmon 상품옵션 조회 -->
+	<select id="selectTmonProductOpt" parameterType="hashMap" resultType="hashMap">
+	/* ProdMapper.selectTmonProductOpt */
+		SELECT productno
+			 , productoptionno
+			 , productoptioncd
+			 , isava
+		  FROM tmon_product_opt
+		 WHERE productcd = #{productcd}::NUMERIC
+		   AND isava = 'Y'
+	</select>
+	
+	<!-- tmon 상품옵션 업데이트 -->
+	<update id="updateTmonProductOpt" parameterType="hashMap">
+	/* ProdMapper.updateTmonProductOpt */
+		UPDATE tmon_product_opt
+			SET isava = #{isava}::TEXT
+			  , optionqty = #{optionqty}::NUMERIC
+			  , modifydate = now()
+		WHERE productcd = #{productcd}::NUMERIC
+		  AND uitemid = #{uitemid}::TEXT
+	</update>
+	
+	<!-- tmon 상품옵션 업데이트 -->
+	<update id="updateTmonProductOptByTempUitemId" parameterType="hashMap">
+	/* ProdMapper.updateTmonProductOpt */
+		UPDATE tmon_product_opt
+			SET isava = #{isava}::TEXT
+			  , modifydate = now()
+			<if test="productno != null and productno != ''">
+			  , productno = #{productno}::TEXT
+			</if>  
+			<if test="uitemid != null and uitemid != ''">
+			  , uitemid = #{uitemid}::TEXT
+			</if>
+		WHERE productcd = #{productcd}::NUMERIC
+		  AND uitemid = #{tempUitemId}::TEXT
+	</update>
+	
+	<!-- tmon 상품 임시옵션 삭제 -->
+	<update id="deleteTempTmonProductOpt" parameterType="hashMap">
+	/* ProdMapper.deleteTempTmonProductOpt */
+		DELETE FROM tmon_product_opt
+		WHERE productcd = #{productcd}::NUMERIC
+		  AND uitemid like 'temp%'
+	</update>
+	
+	<!-- tmon 상품옵션 추가 -->
+	<insert id="insertTmonProductOpt" parameterType="hashMap">
+	/* ProdMapper.insertTmonProductOpt */
+		INSERT INTO tmon_product_opt  
+		(
+			  productno
+			, productcd
+			, productoptioncd
+			, productoptionno
+			, optionprice
+			, isava
+			, optionqty
+			, regdate
+			, modifydate
+		) VALUES (
+			  #{productno}::NUMERIC
+			, #{productcd}::NUMERIC
+			, #{productoptioncd}::TEXT
+			, #{productoptionno}::NUMERIC
+			, #{optionprice}::NUMERIC
+			, #{isava}::TEXT
+			, #{optionqty}::NUMERIC
+			, now()
+			, now()
+		)
+	</insert>
+	
+	<!-- tmon 상품  정보 수정 -->
+	<update id="updateProducts" parameterType="hashMap">
+	/* ProdMapper.updateProducts */
+		UPDATE comm_products
+			SET tmon = #{tmon}
+		WHERE productcd = #{productcd}::NUMERIC
+	</update>     
+	
+	<!-- 상품금액변경 결과 저장 -->
+	<update id="updateProductPriceChange" parameterType="hashMap">
+	/* ProdMapper.updateProductPriceChange */
+		UPDATE comm_products_price_change
+		   SET tmon = #{tmon}
+		 WHERE productcd = #{productcd}::NUMERIC
+	</update>
+	
+	<!-- 상품수량변경 결과 저장 -->
+	<update id="updateProductQtyChange" parameterType="hashMap">
+	/* ProdMapper.updateProductQtyChange */
+		UPDATE comm_products_qty_change
+		   SET tmon = #{tmon}
+		 WHERE productcd = #{productcd}::NUMERIC
+	</update>
+	
+	<!-- 상품상태변경 결과 저장 -->
+	<update id="updateProductStatusChange" parameterType="hashMap">
+	/* ProdMapper.updateProductStatusChange */
+		UPDATE comm_products_status_change
+		   SET tmon = #{tmon}
+		 WHERE productcd = #{productcd}::NUMERIC
+	</update>
+	
+
+	
+	<!-- MH 주문코드 조회 -->
+	<select id="selectOrders" parameterType="hashMap" resultType="hashMap"> 
+	/* ProdMapper.selectOrdersMapping */
+		SELECT m_ordercd
+		  FROM comm_orders
+		 WHERE ordercd = #{ordercd}::TEXT
+		  AND sitename = #{sitename}
+	</select>
+	
+	<!-- QnA 질문 목록 조회 -->
+	<select id="selectQnaQuestionDetail" parameterType="hashMap" resultType="hashMap"> 
+	/* ProdMapper.selectQnaQuestionDetail */
+		SELECT *
+		  FROM comm_qna_products_question
+		 WHERE api_id = #{api_id}::TEXT
+		   AND sitename = #{sitename}
+	</select>
+	
+	<!-- QnA 질문 등록 -->  
+	<insert id="insertQnaQuestion" parameterType="hashMap">
+	/* ProdMapper.insertQnaQuestion */
+		INSERT INTO comm_qna_products_question  
+		(
+			  subject
+			, contents
+			, productcd
+			, m_productcd
+			, ordercd
+			, m_ordercd
+			, username
+			, qnatype
+			, api_id
+			, api_seq
+			, sitename
+			, regdate
+			, apiindexing
+			, indexingdate
+		) VALUES (
+			  #{subject}
+			, #{contents}
+			, #{productno}
+			, #{m_productcd}
+			, #{ordercd}
+			, #{m_ordercd}
+			, #{username}
+			, #{qnatype}
+			, #{api_id}
+			, #{api_seq}
+			, #{sitename}
+			, now()
+			, 'N'
+			, now()
+		)
+	</insert>
+	
+	<!-- QnA 질문 수정 -->  
+	<update id="updateQnaQuestion" parameterType="hashMap">
+	/* ProdMapper.updateQnaQuestion */
+		UPDATE comm_qna_products_question
+			SET subject = #{subject}
+			, contents = #{contents}
+			, productcd = #{productno}
+			, m_productcd = #{m_productcd}
+			, ordercd = #{ordercd}
+			, m_ordercd = #{m_ordercd}
+			, username = #{username}
+			, qnatype = #{qnatype}
+			, api_seq = ''
+			, sitename = #{sitename}
+			, indexingdate = NOW()
+		WHERE api_id = #{api_id}::TEXT
+		AND sitename = #{sitename}
+	</update>
+	
+	<!-- QnA 답변 목록 조회 -->
+	<select id="selectQnaAnswerList" parameterType="hashMap" resultType="hashMap"> 
+	/* ProdMapper.selectQnaAnswerList */
+		SELECT *
+		  FROM comm_qna_products_answer
+		 WHERE apiindexing = 'N'
+		   AND sitename = #{sitename}
+	</select>
+
+	<!-- CS QnA 답변 목록 조회 -->
+	<select id="selectCsQnaAnswerList" parameterType="hashMap" resultType="hashMap">
+		/* ProdMapper.selectCsQnaAnswerList */
+		SELECT *
+		FROM comm_qna_products_answer
+		WHERE apiindexing = 'N'
+		  AND sitename = #{sitename}
+          AND coalesce(api_seq,'') != ''
+	</select>
+	
+	<!-- QnA 답변 API 정보 수정 -->  
+	<update id="updateQnaAnswer" parameterType="hashMap">
+	/* ProdMapper.updateQnaAnswer */
+		UPDATE comm_qna_products_answer
+			SET indexingdate = NOW()
+			, apiindexing = 'Y'
+		WHERE api_id = #{api_id}::TEXT
+		AND sitename = #{sitename}
+	</update>
+	
+	<!-- 셀러 상품삭제건 조회 -->
+	<select id="selectSaleStopSellerProduct" parameterType="hashMap" resultType="hashMap">
+		/* ProdMapper.selectSaleStopSellerProduct */
+		WITH WITH_TABUP AS (
+			WITH  WITH_TAB AS (
+				SELECT sellercd
+					 , 'D' as sellertmon
+				  FROM comm_sellers 
+				 WHERE tmon IN ('D') 
+			)
+			SELECT B.*
+				 , A.*
+			  FROM comm_products A
+				 , with_tab B
+			 WHERE A.sellercd = B.sellercd
+		)
+		SELECT C.productno
+			 , C.tmon
+			 , D.sellertmon
+			 , C.productcd
+		  FROM tmon_products C
+			 , with_tabup D
+		 WHERE C.productcd = D.productcd
+		   AND coalesce(D.sellertmon,'') != coalesce(C.tmon,'')
+		  UNION ALL
+		 SELECT np.productno
+			  , np.tmon
+			  , 'D' as sellertmon
+			  , cp.productcd
+  		   FROM comm_products cp 
+				JOIN tmon_products np on cp.productcd=np.productcd
+          WHERE 7000 > cp.supplyprice
+            AND cp.status='02'
+            AND (np.tmon!='D' or np.tmon is null)
+		 limit 1000
+	</select>
+	
+	<select id="selectProductStopSellingList" parameterType="hashMap" resultType="hashMap">
+		SELECT np.productno ,cp.productcd ,'D' as sellertmon , cp.sellingprice, cp.supplyprice
+		FROM comm_sellers cs
+		inner join comm_products cp on cp.sellercd = cs.sellercd
+		inner join tmon_products np on np.productcd = cp.productcd 
+		<if test='isAppr == "N"'>
+			and np.tmon is null
+		</if>
+		<if test='isAppr == "Y"'>
+			and np.tmon = 'B'
+		</if>
+		WHERE
+		<if test='isAppr == "N"'>
+			(cs.tmon = 'D' and coalesce(np.tmon,'') != 'D')	--셀러 SSG 연동 해제시
+			OR (cs.tmon in ('Y', 'R') and cp.status in ('01', '03', '04') and coalesce(np.tmon ,'') != 'D' and cs.shippingcompanycd is not null and cs.returnaddress1 is not null) --셀러 SSG 연동중이면서 상품이 판매중 아닐때
+			OR (cp.supplyprice <![CDATA[<]]> 7000 and coalesce(np.tmon,'') != 'D' and cp.status ='02')---셀러 SSG 연동중이면서 정산가가 7000원 미만
+		</if>
+		<if test='isAppr == "Y"'>
+			(cs.tmon = 'D')	--셀러 SSG 연동 해제시
+			OR (cs.tmon in ('Y', 'R') and cp.status in ('01', '03', '04') and cs.shippingcompanycd is not null and cs.returnaddress1 is not null) --셀러 SSG 연동중이면서 상품이 판매중 아닐때
+			OR (cp.supplyprice <![CDATA[<]]> 7000 and cp.status ='02')---셀러 SSG 연동중이면서 정산가가 7000원 미만
+		</if>
+		<if test ="limit != null and limit != ''">
+			OFFSET 0 LIMIT #{limit}::NUMERIC 
+		</if>
+	</select>
+	
+	<select id="selectStatusSearchList" parameterType="hashMap" resultType="hashMap">
+		select np.productno, np.productcd , 'D' as sellertmon , cp.sellingprice ,  cp.supplyprice 
+		from tmon_products np
+		inner join comm_products cp on np.productcd =cp.productcd 
+		where np.tmon = 'D'
+		and np.productcd = #{productcd} 
+		and ( select sl.content from schedule_log sl where sl.sitename ='SSG' and productcd = #{productcd} order by regdate desc limit 1) not like '%판매중지 조회대상 제외%'
+		group by np.productno , np.productcd , sellertmon , cp.sellingprice ,cp.supplyprice 
+	</select>
+	
+	<select id="selectStatusDList" parameterType="hashMap" resultType="hashMap">
+		select productcd from tmon_products where tmon = 'D'
+	</select>
+	
+</mapper>

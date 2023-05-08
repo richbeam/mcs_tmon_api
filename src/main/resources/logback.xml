@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 톰캣으로 구동시 한글이 깨질 시 set "JAVA_OPTS=%JAVA_OPTS% -Dfile.encoding=UTF8" 추가 -->
+
+<!--<configuration scan="true" scanPeriod="1 minutes"> -->
+
+<configuration scan="true" scanPeriod="5 seconds">
+
+	<property value="/temp/log/log" name="LOG_FILE_PREFIX" /> 
+	<appender name="CONSOLE"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss}][%thread] %-5level %logger{35}.%M:%L - %msg%n</pattern>			
+		</encoder>
+	</appender>  
+	 
+   
+	<logger name="net.donnert.spring.boot" level="DEBUG" />
+	<logger name="java.sql" level="ERROR" /> 
+	<logger name="jdbc" level="ERROR" additivity="false" />
+	<logger name="jdbc.sqltiming" level="ERROR" additivity="false">
+		<appender-ref ref="CONSOLE" /> 
+	</logger>	
+	<logger name="jdbc.sqlonly" level="ERROR" additivity="false" > 
+	    
+	</logger>
+	<logger name="jdbc.audit" level="ERROR" additivity="false" />
+	<logger name="jdbc.resultset" level="ERROR" additivity="false" />
+	<logger name="jdbc.resultsettable" level="ERROR" additivity="false">
+		<appender-ref ref="CONSOLE" />
+	</logger> 
+	<logger name="org.apache.kafka" level="ERROR" additivity="false"/> 
+
+
+	<root level="WARN">
+		<appender-ref ref="CONSOLE" /> 
+	</root> 
+ 
+</configuration>
+
