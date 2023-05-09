@@ -20,7 +20,7 @@ public class Application extends SpringBootServletInitializer {
 	static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     // 하나의 저장소를 사용하는 경우
-    //@Bean
+    @Bean
     public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager("tokenCacheStore");
     }

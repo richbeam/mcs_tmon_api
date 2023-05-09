@@ -30,7 +30,7 @@
 	<logger name="jdbc.resultsettable" level="ERROR" additivity="false">
 		<appender-ref ref="CONSOLE" />
 	</logger> 
-	<logger name="org.apache.kafka" level="ERROR" additivity="false"/> 
+	<logger name="org.apache.kafka" level="INFO" additivity="false"/>
 
 
 	<root level="WARN">
