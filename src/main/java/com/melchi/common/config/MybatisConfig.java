@@ -32,11 +32,11 @@ public class MybatisConfig {
 		return sessionFactory.getObject();     
 	}
 	   
-	@Bean   
+	/*@Bean
 	SqlSessionTemplate basicSqlSessionTemplate(SqlSessionFactory sqlSessionFactory) throws Exception {		
 		final SqlSessionTemplate sqlSessionTemplate = new BasicSqlSessionTemplate(sqlSessionFactory); 		
 		return sqlSessionTemplate;   
-	}   
+	}   */
 }  
 
 
