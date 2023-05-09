@@ -1,0 +1,100 @@
+server:
+  port: 8085
+  servlet:
+    session:
+      timeout: 7200
+  error:   
+    whitelabel:
+      enabled: false 
+
+
+spring:
+   package-name: tmon
+   package-display-name: TMON
+   db-input-site-name: TMON
+   task:
+    scheduling:
+      pool:
+        size: 40
+   jmx:
+    enabled: false  
+   profiles:      
+    active: dev             
+   jpa:
+    properties: 
+      hibernate: 
+        temp: 
+          use_jdbc_metadata_defaults: false       
+   main:
+    allow-bean-definition-overriding: true
+   devtools:          
+      livereload: #! 클래스 파일 변경시 자동 재시작 여부   
+         enabled: true 
+      restart:
+        log-condition-evaluation-delta: false      
+   http:  
+    encoding:
+      charset: UTF-8
+      enabled: true 
+      force:  true
+    rest-template:
+      max-conn-total: 50
+      max-per-route: 20
+      connect-timeout: 12000
+      read-timeout: 30000
+ 
+
+--- #local
+spring:    
+   profiles: local
+   realApi: https://spc.tmon.co.kr
+   testApi: https://spc-qa.tmon.co.kr
+   datasource:    
+      basic:                       
+         jdbc_url: jdbc:log4jdbc:postgresql://127.0.0.1:5432/postgres         
+         username: postgres     
+         password: 1234                             
+         validation-query: select 1
+         test-on-borrow: true         
+         hikari:            
+            maximumPoolSize: 40
+            maxLifeTime: 180000
+            connectionTimeout: 20000
+         
+--- #dev
+spring: 
+   profiles: dev
+   realApi: https://spc.tmon.co.kr
+   testApi: https://spc-qa.tmon.co.kr
+   datasource:    
+      basic:                  
+         jdbc_url: jdbc:log4jdbc:postgresql://121.78.235.168:5432/postgres
+         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+         username: postgres    
+         password: mcv140625#$     
+         validation-query: select 1
+         test-on-borrow: true
+         hikari:
+             maximumPoolSize: 40
+             maxLifeTime: 180000
+             connectionTimeout: 50000
+            
+--- #real 
+spring: 
+   profiles: real
+   realApi: https://spc.tmon.co.kr
+   testApi: https://spc-qa.tmon.co.kr
+   datasource:    
+      basic:                  
+         jdbc_url: jdbc:postgresql://121.78.235.168:5432/postgres
+         username: postgres    
+         password: mcv140625#$     
+         validation-query: select 1
+         test-on-borrow: true
+         hikari:
+             maximumPoolSize: 40
+             maxLifeTime: 180000
+             connectionTimeout: 50000
+---
+kafka:
+  servers: log0:9092,log1:9092,log2:9092 
