@@ -9,7 +9,7 @@ server:
 
 
 spring:
-   package-name: tmon 
+   package-name: tmon
    package-display-name: TMON
    db-input-site-name: TMON
    task:

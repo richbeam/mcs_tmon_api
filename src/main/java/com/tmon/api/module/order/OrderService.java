@@ -55,36 +55,4 @@ public interface OrderService {
 	 */
 	public void syncOrderStatus(Map<String, Object> order) throws Exception;
 
-
-
-	/**
-	 * 배송지연
-	 *
-	 * @param order
-	 * @throws UserDefinedException
-	 */
-	public void delayOrders(Map<String, Object> order) throws UserDefinedException;
-
-	/**
-	 * 배송완료
-	 * 
-	 * @param order
-	 * @throws UserDefinedException
-	 */
-	public void compShipOrders(Map<String, Object> order) throws UserDefinedException;
-	
-	/**
-	 * 배송완료
-	 * 
-	 * @param order
-	 */
-	public void compShipOrdersByTmon(Map<String, Object> order);
-	
-	/**
-	 * 교환발송처리
-	 * 
-	 * @param order
-	 * @throws UserDefinedException
-	 */
-	public void shipChangeOrders(Map<String, Object> order) throws UserDefinedException;
 }

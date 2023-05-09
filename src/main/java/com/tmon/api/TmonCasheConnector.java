@@ -37,9 +37,9 @@ public class TmonCasheConnector {
 	@Autowired
 	RestTemplate restTemplate;
 	//real
-	//private final String DOMAIN_URL = "https://interworkapi.tmon.co.kr/oauth/tokenI";
+	private final String DOMAIN_URL = "https://interworkapi.tmon.co.kr/oauth/token";
 	//test
-	private final String DOMAIN_URL = "http://interworkapi-test.tmon.co.kr/oauth/token";
+	//private final String DOMAIN_URL = "http://interworkapi-test.tmon.co.kr/oauth/token";
 
 	@Bean
 	public RestTemplate tmonConnectors__() {
@@ -139,8 +139,13 @@ public class TmonCasheConnector {
 
 		logger.info("tokenCall " + path);
 
-        String clientId = "QAMELCHI1";
-        String clientSecret = "cARi1rUv49x1AhyCMUN0";
+
+		//real
+		String clientId = "melchi1";
+		String clientSecret = "Jd12tYdjhgzqiUXXvM2o";
+        //test
+		//String clientId = "QAMELCHI1";
+        //String clientSecret = "cARi1rUv49x1AhyCMUN0";
         String encodingText = clientId+":"+clientSecret;
 
         String authorization = Base64.getUrlEncoder().encodeToString(encodingText.getBytes());
@@ -221,13 +226,13 @@ public class TmonCasheConnector {
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> codeCall(HttpMethod method, String path, RestParameters params) throws UserDefinedException {
 
-		//String URL = "https://interworkapi.tmon.co.kr/api/QAMELCHI/codes";
-		String URL = "http://interworkapi-test.tmon.co.kr/api/QAMELCHI/codes";
-
 		//real
+		String URL = "https://interworkapi.tmon.co.kr/api/QAMELCHI/codes";
+		String Authorization = "d85005d2-4f42-47dd-b534-59e14db017e7";
 		//String Authorization = "";
 		//test
-		String Authorization = "fbf0f280-c23a-4127-ad18-f5be7ac7532f";
+		//String URL = "http://interworkapi-test.tmon.co.kr/api/QAMELCHI/codes";
+		//String Authorization = "fbf0f280-c23a-4127-ad18-f5be7ac7532f";
 		//Authorization = "Basic UUFNRUxDSEkxOmNBUmkxclV2NDl4MUFoeUNNVU4w";
 		//logger.info("CALL " + path);
 

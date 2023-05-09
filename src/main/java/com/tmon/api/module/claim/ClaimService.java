@@ -80,39 +80,5 @@ public interface ClaimService {
 
 
 
-
-
-
-
-
-
-
-
-
-	/**
-	 * 취소조회(Tmon -> 멸치API)
-	 * 
-	 * @param order
-	 */
-	public void cancelOrders(Map<String, Object> order);
-	
-
-	
-	/**
-	 * 반품교환회수  
-	 * 
-	 * @param order
-	 */
-	public void returnOrders(Map<String, Object> order);
-		
-
-	
-	/**
-	 * 회수 완료
-	 * 
-	 * @param order
-	 */
-	public void completeReturnOrders(Map<String, Object> order) throws UserDefinedException;
-
 }
  
