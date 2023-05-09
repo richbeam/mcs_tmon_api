@@ -150,7 +150,7 @@ public class TmonCasheConnector {
 
         String authorization = Base64.getUrlEncoder().encodeToString(encodingText.getBytes());
         logger.warn("getToken authorization :: {}",authorization);
-        authorization = "Basic UUFNRUxDSEkxOmNBUmkxclV2NDl4MUFoeUNNVU4w";
+        authorization = "Basic "+authorization;
 
 		if (params == null) {
 			params = new RestParameters();
