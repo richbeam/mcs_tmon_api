@@ -169,14 +169,14 @@ public class OrderServiceImpl implements OrderService{
 
 			////////////배송지 셋팅
 			Map<String, Object> receiverAddress = (Map<String,Object>)order.get("receiverAddress");
-			if(receiverAddress != null && null != receiverAddress.get("zipCode") && (receiverAddress.get("zipCode").toString().length() > 5)){
-				commOrderMap.put("recvpostcode1", receiverAddress.get("zipCode").toString().substring(0,3));   //우편번호 (기존 RECVPOSTCODE1(3자리)-RECVPOSTCODE2(3자리) 에서 RECVPOSTCODE1:(5자리)로 변경
-				commOrderMap.put("recvpostcode2", receiverAddress.get("zipCode").toString().substring(3));    //우편번호2
-			} else {
-				if(null == receiverAddress.get("zipCode")){
+			if(receiverAddress != null && null != receiverAddress.get("zipCode").toString() && StringUtil.decryption(receiverAddress.get("zipCode").toString()).length() > 5){
+				commOrderMap.put("recvpostcode1", StringUtil.decryption(receiverAddress.get("zipCode").toString()).substring(0,3));   //우편번호 (기존 RECVPOSTCODE1(3자리)-RECVPOSTCODE2(3자리) 에서 RECVPOSTCODE1:(5자리)로 변경
+				commOrderMap.put("recvpostcode2", StringUtil.decryption(receiverAddress.get("zipCode").toString()).substring(3));    //우편번호2
+			}else {
+				if(null == StringUtil.decryption(receiverAddress.get("zipCode").toString())){
 					commOrderMap.put("recvpostcode1", "00000");
 				}else{
-					commOrderMap.put("recvpostcode1", receiverAddress.get("zipCode").toString());
+					commOrderMap.put("recvpostcode1", StringUtil.decryption(receiverAddress.get("zipCode").toString()));
 				}
 
 			}
