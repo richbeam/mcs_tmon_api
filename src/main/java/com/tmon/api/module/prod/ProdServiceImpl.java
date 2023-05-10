@@ -389,6 +389,12 @@ public class ProdServiceImpl implements ProdService {
 			String productType = "DP07";
 			//배송 타입 (당일/익일/예외/종료)
 			String deliveryType = "ND";
+			//출고 소요일 체크
+			/*if(Integer.parseInt(mProduct.get("releaseterm").toString()) >2){
+				//예외
+				deliveryType = "ED";
+			}*/
+
 			if(mProduct.get("shippingmethod").toString().equals("02")){
 				productType = "DP04";
 				deliveryType = "ED";
