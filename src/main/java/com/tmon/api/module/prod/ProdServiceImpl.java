@@ -393,16 +393,15 @@ public class ProdServiceImpl implements ProdService {
 				productType = "DP04";
 				deliveryType = "ED";
 			}
-			mProduct.put("productType",productType);
-			mProduct.put("deliveryType",deliveryType);
 
-			product.put("productType",productType);               		//	ProductType 배송상품 유형 타입  O       배송템플릿의 상품타입과 일치해야함
+			mProduct.put("deliveryType",deliveryType);
+			mProduct.put("productType",productType);
 
             if(tType.equals("I")){
 
-//멸치 상품 코드
+				//멸치 상품 코드
 				product.put("vendorDealNo",productcd);                 	//	String(1..50)   딜번호(티몬전시단위)에 해당 연동업체측 키 O       연동사별로 유일한 50자 이내의 문자 값이어야하며 연동사에서 생성 관리 되는 값
-
+				product.put("productType",productType);               		//	ProductType 배송상품 유형 타입  O       배송템플릿의 상품타입과 일치해야함
 				//배송지 셋팅 벤더사 정책번호(vendorPolicyNo) :test 923 real :158
 				product.put("vendorPolicyNo",158);                 	//  Integer+    티몬 오퍼레이터를 통해 받은 정책번호    O
 
