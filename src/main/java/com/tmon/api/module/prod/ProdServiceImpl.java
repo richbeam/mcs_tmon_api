@@ -161,6 +161,7 @@ public class ProdServiceImpl implements ProdService {
 							+"_"+mProduct.get("additionalshippingfee").toString()
 							+"_"+mProduct.get("shippingfeepaytype").toString()
 							+"_"+mProduct.get("freeshippingamount").toString();
+					logger.warn("------------ deliveryTemplateName : {}",deliveryTemplateName);
 					request.put("deliveryTemplateName",deliveryTemplateName);					//	String	관리 배송템플릿 명	O
 					//멸치쇼핑은 무조건 묶음배송 없음.
 					request.put("bundledDeliveryAble",false);					//	Boolean	묶음배송가능여부	O		딜 등록시 사용한 배송템플릿 번호가 같더라도, 묶음배송가능여부가 false 이면, 딜별로 각각 배송비가 발생합니다
@@ -217,7 +218,7 @@ public class ProdServiceImpl implements ProdService {
 
 				template = basicSqlSessionTemplate.selectOne("ProdMapper.selectTmonDeliveryTemplate", request);
 				if(template == null){
-					//배송지 ,반품지 신규등록
+					//배송 템플릿
 					path = "/partners/templates";
 					//requestD.put("sellercd",seller.get("sellercd")); //판매자 코드
 					params.setBody(request);
