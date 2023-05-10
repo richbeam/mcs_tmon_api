@@ -13,8 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
-
-	private static final String SECRET_KEY = "prnRZ6u0AqZAG6jG"; //비밀키 노출에 주의! 개발/리얼환경 각각 별도로 전달됩니다.
+	//real
+	private static final String SECRET_KEY = "Jd12tYdjhgzqiUXXvM2o"; //비밀키 노출에 주의! 개발/리얼환경 각각 별도로 전달됩니다.
+	//test
+	//private static final String SECRET_KEY = "prnRZ6u0AqZAG6jG"; //비밀키 노출에 주의! 개발/리얼환경 각각 별도로 전달됩니다.
 	/**
 	 * 문자열이 null이나 공백인지를 체크
 	 * 
