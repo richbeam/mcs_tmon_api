@@ -403,17 +403,6 @@ public class ProdServiceImpl implements ProdService {
                 product.put("vendorPolicyNo",158);                 	//  Integer+    티몬 오퍼레이터를 통해 받은 정책번호    O
                 product.put("productType",productType);               		//	ProductType 배송상품 유형 타입  O       배송템플릿의 상품타입과 일치해야함
 
-                //배송 템플릿 셋팅
-                String deliveryTemplateNo = "";
-                Map<String, Object> template = selectDeliTemplate(mProduct, seller);
-                if(template.get("tStatus").equals("SUCCESS")){
-                    deliveryTemplateNo = template.get("deliverytemplateno").toString();
-                }else{
-                    product.put("tStatus","FAIL");
-                    product.put("tMessage",template.get("tMessage"));
-                    return product;
-                }
-                product.put("deliveryTemplateNo",Integer.parseInt(deliveryTemplateNo));                //  Integer+    배송템플릿번호 O
 
 				//현재 시간 설정
 				LocalDateTime now = LocalDateTime.now();
@@ -431,7 +420,17 @@ public class ProdServiceImpl implements ProdService {
             }
 
 
-
+			//배송 템플릿 셋팅
+			String deliveryTemplateNo = "";
+			Map<String, Object> template = selectDeliTemplate(mProduct, seller);
+			if(template.get("tStatus").equals("SUCCESS")){
+				deliveryTemplateNo = template.get("deliverytemplateno").toString();
+			}else{
+				product.put("tStatus","FAIL");
+				product.put("tMessage",template.get("tMessage"));
+				return product;
+			}
+			product.put("deliveryTemplateNo",Integer.parseInt(deliveryTemplateNo));                //  Integer+    배송템플릿번호 O
 
 
 			///////////////////////////////////////////////////////////////////////// 판매가 셋팅
