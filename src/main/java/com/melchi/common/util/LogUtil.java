@@ -70,11 +70,11 @@ public class LogUtil {
 		String content = null;
 
 		if (orderStatus.equals(BaseConst.OrderStauts.STAUTS_02)) {
-			content = "주문확인";
+			content = "결제완료";
 		} else if (orderStatus.equals(BaseConst.OrderStauts.STAUTS_03)) {
-			content = "발주처리";
+			content = "주문확인";
 		} else if (orderStatus.equals(BaseConst.OrderStauts.STAUTS_04)) {
-			content = "배송처리";
+			content = "배송중";
 		} else if (orderStatus.equals(BaseConst.OrderStauts.STAUTS_05)) {
 			content = "배송완료";
 		} else if (orderStatus.equals(BaseConst.OrderStauts.STAUTS_06)) {
