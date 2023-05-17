@@ -898,7 +898,7 @@ public class ProdServiceImpl implements ProdService {
 			}else{
 				//상품상태값 변경
 				sqlMap.put("tmon", "E");
-				//basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
+				basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
 
 				//로그 생성
 				logMap.put("content", e.getMessage());
