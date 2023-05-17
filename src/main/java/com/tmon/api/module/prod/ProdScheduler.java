@@ -64,7 +64,7 @@ public class ProdScheduler {
 	 * @throws Exception
 	 */
 	//@Scheduled(cron="0 0/4 * * * ?")
-    @Scheduled(initialDelay = 1900, fixedDelay = 18000)
+    @Scheduled(initialDelay = 1900, fixedDelay = 128000)
 	public void insertProducts() throws Exception {
 		logger.warn(">>>>>>>>>>> selectNewProducts start");
 		//등록 대상건 조회
@@ -81,7 +81,7 @@ public class ProdScheduler {
 	 * @throws Exception
 	 */
 	//@Scheduled(cron="40 0/1 * * * ?")
-	@Scheduled(initialDelay = 19900, fixedDelay = 25000)
+	@Scheduled(initialDelay = 19900, fixedDelay = 125000)
 	public Response updateProducts() throws Exception {
 		logger.warn(">>>>>>>>>>> selectUpdatedProducts start");
 		//수정 대상건 조회
