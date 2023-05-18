@@ -103,13 +103,15 @@ public class ClaimScheduler {
 							}
 							for(Map<String, Object> claim : claims) {
 								try {
-									//취소건 등록여부 체크
+									//클레임 등록여부 체크
 									boolean isExist = true;
 									List<Map<String, Object>> claimDeals =(List<Map<String, Object>>)claim.get("claimDeals");
 									for(Map<String, Object> claimDeal : claimDeals){
 										selMap.put("ordercd",claim.get("tmonOrderNo").toString());
 										selMap.put("detail_no",claimDeal.get("tmonDealNo").toString());
+										logger.warn("------클레임 등록여부 체크 : {} , {} ", claim.get("tmonOrderNo").toString(),claimDeal.get("tmonDealNo").toString());
 										Map<String, Object> orderMap = basicSqlSessionTemplate.selectOne("ClaimMapper.selectTmonMappingClaimInfo", selMap);
+
 										if(!orderMap.get("claimno").toString().equals(claim.get("claimNo").toString())|| orderMap.get("claimno").toString().equals("") ||orderMap.get("claimno").toString() == null ){
 											isExist = false;
 											break;
