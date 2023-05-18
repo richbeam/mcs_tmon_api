@@ -153,6 +153,8 @@ public class ProdServiceImpl implements ProdService {
 				//템플릿 셋팅
 				Map<String, Object> request = new HashMap<>();
 
+					//배송비 셋팅 수량별 배송비는 무료 배송으로 으로 셋팅
+
 					//템플릿명 셀러코드_배송방법_배송비방식_배송비_도서산간배송비_배송비결제방식_조건부배송금
 					String deliveryTemplateName = mProduct.get("sellercd")
 							+"_"+mProduct.get("shippingmethod").toString()
@@ -161,6 +163,10 @@ public class ProdServiceImpl implements ProdService {
 							+"_"+mProduct.get("additionalshippingfee").toString()
 							+"_"+mProduct.get("shippingfeepaytype").toString()
 							+"_"+mProduct.get("freeshippingamount").toString();
+					//--수량별 배송비 무료배송 처리
+					if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
+						deliveryTemplateName += "_"+mProduct.get("quantitycntuseyn").toString();
+					}
 					logger.warn("------------ deliveryTemplateName : {}",deliveryTemplateName);
 					request.put("deliveryTemplateName",deliveryTemplateName);					//	String	관리 배송템플릿 명	O
 					//멸치쇼핑은 무조건 묶음배송 없음.
@@ -168,7 +174,7 @@ public class ProdServiceImpl implements ProdService {
 
 					//배송비 방식 셋팅
 					String deliveryFeePolicy ="";
-					if(mProduct.get("shippingfeetype").toString().equals("01")){
+					if(mProduct.get("shippingfeetype").toString().equals("01") || mProduct.get("quantitycntuseyn").toString().equals("Y")){
 						deliveryFeePolicy ="FREE";
 					}else if(mProduct.get("shippingfeetype").toString().equals("02")){
 						deliveryFeePolicy ="PER";
@@ -178,8 +184,14 @@ public class ProdServiceImpl implements ProdService {
 						deliveryFeePolicy ="CONDITION";
 					}
 					request.put("deliveryFeePolicy",deliveryFeePolicy);					//	DeliveryFeePolicy	배송비 정책 타입	O FREE : 무료배송, CONDITION : 조건부무료배송, PER : 선불, AFTER : 착불
-					//배송비 셋팅
-					request.put("deliveryFee",Integer.parseInt(mProduct.get("shippingfee").toString()));							//	Integer+	배송비 금액 (원)	O
+
+					//배송비 셋팅 수량별 배송일 경우 --수량별 배송비 무료배송 처리
+					if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
+						request.put("deliveryFee",0);							//	Integer+	배송비 금액 (원)	O
+					}else{
+						request.put("deliveryFee",Integer.parseInt(mProduct.get("shippingfee").toString()));							//	Integer+	배송비 금액 (원)	O
+					}
+
 					request.put("deliveryFeeFreePrice",Integer.parseInt(mProduct.get("freeshippingamount").toString()));					//	Integer+	조건부 무료배송 기준 금액 (원)	V		배송비정책이 조건부무료배송(CONDITION)일때 필수
 					request.put("productType",mProduct.get("productType"));							//	ProductType	배송 상품타입	O		딜 등록시 productType과 반드시 일치
 					request.put("deliveryType",mProduct.get("deliveryType"));							//	DeliveryType	배송 타입 (당일/익일/예외/종료)	O
@@ -443,6 +455,10 @@ public class ProdServiceImpl implements ProdService {
 			int price = 0;
 			//멸치 공급가격
 			BigDecimal supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString()));
+			if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
+				supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString())+Integer.parseInt(mProduct.get("shippingfee").toString()));
+			}
+
 			//멸치 판매가격
 			BigDecimal sellingprice = new BigDecimal(Integer.parseInt(mProduct.get("sellingprice").toString()));
 			//수수료율

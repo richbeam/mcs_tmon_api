@@ -106,6 +106,7 @@
 		   AND NOT EXISTS(select 1 from tmon_products where productcd = cp.productcd )
 		   AND cp.productname not like '%로얄%'
 		   AND cp.overseas_goods_sales_yn = 'N'
+		   AND coalesce(cp.limitcntuseyn,'N') = 'N'
 		   /*AND cc2.cateCd != '45'
 		   AND ( cp.isusedproductoption = 0 
 				  OR (cp.ISUSEDPRODUCTOPTION IN (1,2) AND cp.productcd NOT IN (

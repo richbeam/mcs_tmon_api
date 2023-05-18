@@ -107,6 +107,9 @@ public class OrderServiceImpl implements OrderService{
 			int outpostshipamount = 0;
 			//결재금액 합산금액
 			int amount = 0;
+			//comm_orders 사용할 금액 체
+			int tAmount = 0;
+			int tShipamount = 0;
 
 			for(Map<String, Object> deals_ : (List<Map<String, Object>>)order.get("deals")) {
 				//티몬 배송비 정보
@@ -147,11 +150,6 @@ public class OrderServiceImpl implements OrderService{
 			//주문코드
 			commOrderMap.put("ordercd", ordNo);
 
-			//주문금액
-
-			commOrderMap.put("amount" , amount);
-			//배송비총액
-			commOrderMap.put("shipamount",  shipamount);
 			//할인총액
 			commOrderMap.put("discountamount", "0");
 			//사용한쇼핑포인트금액
@@ -306,11 +304,32 @@ public class OrderServiceImpl implements OrderService{
 					int sellingprice = 0;
 					int qty = 0;
 					amount = 0;
+
+
 					for(Map<String, Object> opt : dealOptions){
 						amount += Integer.valueOf(opt.get("purchasePrice").toString().trim());
 						sellingprice = Integer.valueOf(opt.get("salesPrice").toString().trim());
 						qty += Integer.valueOf(opt.get("qty").toString().trim());
 					}
+
+					//수량별 배송일 경우 배송비 분리
+					if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
+						int cnt = Integer.parseInt(mProduct.get("salelimitcnt").toString());
+						if(cnt == 0){
+							cnt = 1;
+						}
+						shipamount = (Integer.parseInt(mProduct.get("shippingfee").toString()) * (qty/cnt)+1) + Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim());
+						amount  = amount - shipamount;
+						sellingprice  = sellingprice - shipamount;
+					}else {
+						//배송비 셋팅
+						shipamount = deals.get("deliveryFee") != null ? Integer.parseInt(deliveryFee.get("amount").toString().trim()) + Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim()) : 0;
+						outpostshipamount = deals.get("longDistanceAmount") != null ? Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim()) : 0;
+					}
+					//배송비
+					commOrderDetailMap.put("shippingfee", shipamount);
+					commOrderDetailMap.put("chargedshippingfee", shipamount);
+
 					//상품단가
 					commOrderDetailMap.put("sellingprice", sellingprice);
 					//판매가
@@ -320,13 +339,13 @@ public class OrderServiceImpl implements OrderService{
 					//공급가 입력
 					commOrderDetailMap.put("supplyprice", mProduct.get("supplyprice"));
 
-					//배송비 셋팅
-					shipamount = deals.get("deliveryFee") != null ? Integer.parseInt(deliveryFee.get("amount").toString().trim()) + Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim()) : 0;
-					outpostshipamount = deals.get("longDistanceAmount") != null ? Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim()) : 0;
-					//배송비
-					commOrderDetailMap.put("shippingfee", shipamount);
-					commOrderDetailMap.put("chargedshippingfee", shipamount);
 
+					/*commOrderDetailMap.put("apisellingprice",sellingprice);
+					commOrderDetailMap.put("apiamount",amount);
+					commOrderDetailMap.put("apidiscountamt",0);*/
+
+					tAmount += amount;
+					tShipamount += shipamount;
 					//주문상태[ORDERSTATUS - 01:입금대기,02:결제완료,03:주문확인,04:배송중,05:배송완료,06:취소요청,07:취소완료,08:교환요청,09:교환 회수중,10:교환 회수완료,11:교환 배송중,12:교환 배송완료,13:반품요청,14:반품 회수중,15:반품 회수완료,16:환불완료(이머니),17:환불요청(계좌),18:환불완료(계좌),19:환불완료(신용카드),20:결재완료]'
 					commOrderDetailMap.put("status", BaseConst.OrderStauts.STAUTS_02);
 					//api index
@@ -405,6 +424,11 @@ public class OrderServiceImpl implements OrderService{
 					if(order.toString().length() > 4500) {
 						orderfullcontents = order.toString().substring(0,4500);
 					}
+					//주문총금액
+					commOrderMap.put("amount" , tAmount);
+					//배송비총액
+					commOrderMap.put("shipamount",  tShipamount);
+
 					commOrderMap.put("orderfullcontents", orderfullcontents);
 					commOrderMap.put("sellercd", sellercd);
 					//comm_order 등록
