@@ -93,7 +93,7 @@ public class OrderScheduler {
 
 	//주문확인 연동 처리 [ 배송 대상 확인 ] 
 	//@Scheduled(cron = "0 0/13 * * * *")
-	@Scheduled(initialDelay = 2500, fixedDelay = 63000)
+	@Scheduled(initialDelay = 2500, fixedDelay = 123000)
 	public void confirmOrders() throws Exception {
 		logger.warn(">>>>>>>>>>> 주문확인 처리 시작");
 		//대상 조회
@@ -151,7 +151,7 @@ public class OrderScheduler {
 
 	//배송중 - 송장등록 처리 [ 송장 등록/수정 ] 
 	//@Scheduled(cron = "0 0/6 * * * ?")
-	@Scheduled(initialDelay = 3500, fixedDelay = 65000)
+	@Scheduled(initialDelay = 3500, fixedDelay = 125000)
 	public void shipOrders() throws Exception {
 		logger.warn(">>>>>>>>>>> 송장등록 처리 시작");
 		//대상 조회

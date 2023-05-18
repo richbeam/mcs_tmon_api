@@ -111,11 +111,13 @@ public class ClaimScheduler {
 										selMap.put("detail_no",claimDeal.get("tmonDealNo").toString());
 										logger.warn("------클레임 등록여부 체크 : {} , {} ", claim.get("tmonOrderNo").toString(),claimDeal.get("tmonDealNo").toString());
 										Map<String, Object> orderMap = basicSqlSessionTemplate.selectOne("ClaimMapper.selectTmonMappingClaimInfo", selMap);
+                                        if(null != orderMap){
+                                            if(!orderMap.get("claimno").toString().equals(claim.get("claimNo").toString())|| orderMap.get("claimno").toString().equals("") ||orderMap.get("claimno").toString() == null ){
+                                                isExist = false;
+                                                break;
+                                            }
+                                        }
 
-										if(!orderMap.get("claimno").toString().equals(claim.get("claimNo").toString())|| orderMap.get("claimno").toString().equals("") ||orderMap.get("claimno").toString() == null ){
-											isExist = false;
-											break;
-										}
 									}
 
 									if(isExist == false){
