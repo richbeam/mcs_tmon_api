@@ -60,7 +60,7 @@ public class OrderScheduler {
 		String today = StringUtil.getTodayString("yyyy-MM-dd HH:mm");
 
 		String startDate = StringUtil.orderTimeAdd(today, -1530);
-		String endDate = StringUtil.orderTimeAdd(today, -30);
+		String endDate = StringUtil.orderTimeAdd(today, -40);
 		logger.warn("-----startDate : endDate = {} : {}",startDate,endDate);
 
 

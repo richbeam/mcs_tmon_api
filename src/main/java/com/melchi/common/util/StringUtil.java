@@ -505,7 +505,7 @@ public class StringUtil {
 
 			byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedUserId));
 
-			System.out.println("----"+new String(decrypted));
+			//System.out.println("----"+new String(decrypted));
 			return new String(decrypted);
 		}catch (Exception e){
 			e.printStackTrace();
