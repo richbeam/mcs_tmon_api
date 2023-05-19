@@ -716,12 +716,14 @@ public class ProdServiceImpl implements ProdService {
 						Map<String, Object> DealProductInfoItem = new HashMap<>();
 						List<Map<String, Object>> mnoti = basicSqlSessionTemplate.selectList("ProdMapper.selectTmonNoti", mProduct);
 						for(Map<String, Object> noti : mnoti){
+							DealProductInfoItem = new HashMap<>();
 							DealProductInfoItem.put("section",noti.get("notiname").toString());
 							DealProductInfoItem.put("description","상세설명참조");
 							DealProductInfoItems.add(DealProductInfoItem);
-							//그룹명 설정
-							productInfo.put("productType",noti.get("tnotigroupname").toString());
+
 						}
+					//그룹명 설정
+					productInfo.put("productType",mnoti.get(0).get("tnotigroupname").toString());
 						/*DealProductInfoItem.put("section","법적허가/신고대상상품");
 						DealProductInfoItem.put("description","상세설명참조");
 						DealProductInfoItems.add(DealProductInfoItem);*/
