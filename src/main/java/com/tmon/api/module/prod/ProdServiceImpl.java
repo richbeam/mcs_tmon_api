@@ -1030,6 +1030,7 @@ public class ProdServiceImpl implements ProdService {
 				if(product.get("tStatus").equals("FAIL")){
 					logger.error("::::::update 상품 매핑시 오류 발생 ::"+product.toString());
 				}else{
+					logger.error("::::::update 상품  ::"+product.toString());
 					response = connector.call(HttpMethod.PUT, path, params);
 					logger.warn("::::::::::::::::::::::update response = "+response.toString());
 					Map<String, Object> deal = (Map<String, Object>)response.get("deal");
