@@ -90,7 +90,7 @@ public class CommonService {
     	switch (codeGrp) {
 			/* 과세여부 mapping
 			 * MH	- 0:비과세,1:과세
-			 * ssg  - 10 : 과세, 20 : 면세, 30 : 영세
+			 * TMON  - 10 : 과세, 20 : 면세, 30 : 영세
 			 * */    	
 			case "istaxed":
 				switch(code) {
@@ -104,7 +104,7 @@ public class CommonService {
 			break;
 			/* 성인인증 mapping
 			 * MH	- 0:일반,1:성인
-			 * ssg -  10 : 성인 상품, 20 : 주류 상품, 90 : 일반 상품
+			 * TMON -  10 : 성인 상품, 20 : 주류 상품, 90 : 일반 상품
 			 * */    	
 			case "isadultauth":
 				switch(code) {

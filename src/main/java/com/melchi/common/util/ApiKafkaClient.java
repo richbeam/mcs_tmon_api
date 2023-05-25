@@ -48,7 +48,7 @@ public class ApiKafkaClient {
 	 */
 	public void sendApiSyncProductHistoryMessage(String productCd, String productNo, String sellingprice, String supplyprice, String status, String url, String contents) {
 		//응답결과 생성 {버전|상품코드|싸이트|싸이트상품번호|판매가|공급가|상품상태|URL}
-		String[] responseMessage = {"V1", productCd, "SSG", productNo, sellingprice, supplyprice, status, url, contents};
+		String[] responseMessage = {"V1", productCd, "TMON", productNo, sellingprice, supplyprice, status, url, contents};
 		String kafkaMessage = StringUtils.join(responseMessage, "|");
 		
 		Producer<String, String> producer = new KafkaProducer<String, String>(this.props);
@@ -64,7 +64,7 @@ public class ApiKafkaClient {
 	 */
 	public void sendApiSyncProductHistoryMessage(Map<String, Object> paramMap) {
 		//응답결과 생성 {버전|상품코드|싸이트|싸이트상품번호|판매가|공급가|상품상태|URL|내용}
-		String[] responseMessage = {"V1", "", "SSG", "", "0", "0", "", "", ""};
+		String[] responseMessage = {"V1", "", "TMON", "", "0", "0", "", "", ""};
 		//상품코드
 		if(paramMap.get("productcd") != null) {
 			responseMessage[1] = paramMap.get("productcd").toString().trim();	

@@ -797,13 +797,16 @@ public class ProdServiceImpl implements ProdService {
 		
 		//로그 기본값 셋팅
 		Map<String, Object> logMap = new HashMap<>();
+		logMap.put("sitename", "TMON");
 		logMap.put("productcd", newProduct.get("productcd"));
 		logMap.put("api_url", "/deals");
 		logMap.put("status", BaseConst.ProdStauts.STAUTS_01);
-		
+		//멸치 상품조회
+		Map<String, Object> mProduct = basicSqlSessionTemplate.selectOne("ProdMapper.selectProducts", paramMap);
+		//옵션 그룹 정보
+		List<Map<String, Object>> optionGroup = basicSqlSessionTemplate.selectList("ProdMapper.selectCommProductOptGroup", mProduct);
 		try {	
-			//멸치 상품조회
-			Map<String, Object> mProduct = basicSqlSessionTemplate.selectOne("ProdMapper.selectProducts", paramMap);
+
 			mProduct.put("deliverycorp",newProduct.get("deliverycorp").toString());
 			//Tmon 상품조회
 			Map<String, Object> tmonProduct = basicSqlSessionTemplate.selectOne("ProdMapper.selectTmonProducts", paramMap);
@@ -813,8 +816,7 @@ public class ProdServiceImpl implements ProdService {
 			// 판매자정보 조회
 			paramMap.put("sellercd", mProduct.get("sellercd").toString());
 			Map<String, Object> mSeller = basicSqlSessionTemplate.selectOne("ProdMapper.selectSeller", paramMap);
-			//옵션 그룹 정보
-			List<Map<String, Object>> optionGroup = basicSqlSessionTemplate.selectList("ProdMapper.selectCommProductOptGroup", mProduct);
+
 			//옵션정보
 			List<Map<String, Object>> optionList = new ArrayList<>();
 			if(null != optionGroup){
@@ -912,7 +914,41 @@ public class ProdServiceImpl implements ProdService {
 			logger.error("u상품 등록 예외발생 : {}", e.getMessage().toString());
 			if(e.getMessage().toString().contains("이미 등록 완료된 딜입니다.")){
 				//상품 조회후 tmon_product 매핑하기
-				logger.warn("------상품 중복 발생");
+				logger.warn("------상품 중복 발생 : {}",newProduct.get("productcd").toString());
+				String path = "/deals/"+newProduct.get("productcd").toString();
+				RestParameters params = new RestParameters();
+				Map<String, Object> response = connector.call(HttpMethod.GET, path, params);
+				//멸치 DB에 상품등록
+				sqlMap.put("productno", response.get("tmonDealNo").toString());
+				sqlMap.put("supplyprice", mProduct.get("supplyprice"));
+				if(null != optionGroup){
+					sqlMap.put("optgroupcnt", optionGroup.size());
+				}else{
+					sqlMap.put("optgroupcnt", 1);
+				}
+
+				basicSqlSessionTemplate.insert("ProdMapper.insertTmonProducts", sqlMap);
+
+				//옵션 동기화
+				if(response.get("dealOptionNos") != null) {
+					List<Map<String, Object>> optList = (List<Map<String, Object>>)response.get("dealOptions");
+					Map<String, Object> dealOptionNos = (Map<String, Object>) response.get("dealOptionNos");
+					for(Map<String, Object> opt : optList) {
+						//맵핑테이블 업데이트
+						sqlMap.put("productoptionno", Long.parseLong(dealOptionNos.get(opt.get("vendorDealOptionNo").toString()).toString()));
+						sqlMap.put("productoptioncd",opt.get("vendorDealOptionNo").toString());
+						sqlMap.put("isava", opt.get("display").toString());
+						sqlMap.put("optionprice", Integer.parseInt(opt.get("salesPrice").toString()));
+						sqlMap.put("optionqty", Integer.parseInt(opt.get("stock").toString()));
+
+						basicSqlSessionTemplate.insert("ProdMapper.insertTmonProductOpt", sqlMap);
+						//basicSqlSessionTemplate.update("ProdMapper.updateTmonProductOptByTempUitemId", sqlMap);
+					}
+				}
+
+				sqlMap.put("tmon", "Y");
+				basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
+				
 			}else{
 				//상품상태값 변경
 				sqlMap.put("tmon", "E");
@@ -971,6 +1007,7 @@ public class ProdServiceImpl implements ProdService {
 		
 		//로그 기본값 셋팅
 		Map<String, Object> logMap = new HashMap<>();
+		logMap.put("sitename", "TMON");
 		logMap.put("productcd", newProduct.get("productcd"));
 		logMap.put("api_url", "/deals/"+newProduct.get("productcd"));
 		logMap.put("status", BaseConst.ProdStauts.STAUTS_02);
