@@ -48,8 +48,8 @@ public class OrderController {
 	@ApiOperation(value = "[TMON] 신규 주문 조회처리 Manual", notes = "[TMON] Manual 신규주문을 조회 한다.", authorizations = {@Authorization(value="basicAuth")})
 	@RequestMapping(value="/getTmonOrderListManual", method = {RequestMethod.GET})
 	public Response getTmonOrderList (
-			@ApiParam(value = "조회시작일", name = "startDate", defaultValue = "2023-04-10T10:00:00", required = false) @RequestParam String startDate,
-			@ApiParam(value = "조회종료일", name = "endDate", defaultValue = "2023-04-12T10:00:00", required = false) @RequestParam String endDate
+			@ApiParam(value = "조회시작일", name = "startDate", defaultValue = "2023-05-21T10:00:00", required = false) @RequestParam String startDate,
+			@ApiParam(value = "조회종료일", name = "endDate", defaultValue = "2023-05-21T23:00:00", required = false) @RequestParam String endDate
 	) throws Exception {
 		Response response = new Response();
 		logger.warn(">>getTmonOrderListTest Manual 결제완료 주문건조회 시작");
