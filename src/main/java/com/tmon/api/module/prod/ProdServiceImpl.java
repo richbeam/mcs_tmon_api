@@ -917,38 +917,44 @@ public class ProdServiceImpl implements ProdService {
 				logger.warn("------상품 중복 발생 : {}",newProduct.get("productcd").toString());
 				String path = "/deals/"+newProduct.get("productcd").toString();
 				RestParameters params = new RestParameters();
-				Map<String, Object> response = connector.call(HttpMethod.GET, path, params);
-				//멸치 DB에 상품등록
-				sqlMap.put("productno", response.get("tmonDealNo").toString());
-				sqlMap.put("supplyprice", mProduct.get("supplyprice"));
-				if(null != optionGroup){
-					sqlMap.put("optgroupcnt", optionGroup.size());
-				}else{
-					sqlMap.put("optgroupcnt", 1);
-				}
-
-				basicSqlSessionTemplate.insert("ProdMapper.insertTmonProducts", sqlMap);
-
-				//옵션 동기화
-				if(response.get("dealOptionNos") != null) {
-					List<Map<String, Object>> optList = (List<Map<String, Object>>)response.get("dealOptions");
-					Map<String, Object> dealOptionNos = (Map<String, Object>) response.get("dealOptionNos");
-					for(Map<String, Object> opt : optList) {
-						//맵핑테이블 업데이트
-						sqlMap.put("productoptionno", Long.parseLong(dealOptionNos.get(opt.get("vendorDealOptionNo").toString()).toString()));
-						sqlMap.put("productoptioncd",opt.get("vendorDealOptionNo").toString());
-						sqlMap.put("isava", opt.get("display").toString());
-						sqlMap.put("optionprice", Integer.parseInt(opt.get("salesPrice").toString()));
-						sqlMap.put("optionqty", Integer.parseInt(opt.get("stock").toString()));
-
-						basicSqlSessionTemplate.insert("ProdMapper.insertTmonProductOpt", sqlMap);
-						//basicSqlSessionTemplate.update("ProdMapper.updateTmonProductOptByTempUitemId", sqlMap);
+				try{
+					Map<String, Object> response = connector.call(HttpMethod.GET, path, params);
+					//멸치 DB에 상품등록
+					sqlMap.put("productno", response.get("tmonDealNo").toString());
+					sqlMap.put("supplyprice", mProduct.get("supplyprice"));
+					if(null != optionGroup){
+						sqlMap.put("optgroupcnt", optionGroup.size());
+					}else{
+						sqlMap.put("optgroupcnt", 1);
 					}
+
+					basicSqlSessionTemplate.insert("ProdMapper.insertTmonProducts", sqlMap);
+
+					//옵션 동기화
+					if(response.get("dealOptionNos") != null) {
+						List<Map<String, Object>> optList = (List<Map<String, Object>>)response.get("dealOptions");
+						Map<String, Object> dealOptionNos = (Map<String, Object>) response.get("dealOptionNos");
+						for(Map<String, Object> opt : optList) {
+							//맵핑테이블 업데이트
+							sqlMap.put("productoptionno", Long.parseLong(dealOptionNos.get(opt.get("vendorDealOptionNo").toString()).toString()));
+							sqlMap.put("productoptioncd",opt.get("vendorDealOptionNo").toString());
+							sqlMap.put("isava", opt.get("display").toString());
+							sqlMap.put("optionprice", Integer.parseInt(opt.get("salesPrice").toString()));
+							sqlMap.put("optionqty", Integer.parseInt(opt.get("stock").toString()));
+
+							basicSqlSessionTemplate.insert("ProdMapper.insertTmonProductOpt", sqlMap);
+							//basicSqlSessionTemplate.update("ProdMapper.updateTmonProductOptByTempUitemId", sqlMap);
+						}
+					}
+
+					sqlMap.put("tmon", "Y");
+					basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
+				}catch (Exception e1){
+					e1.printStackTrace();
 				}
 
-				sqlMap.put("tmon", "Y");
-				basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
-				
+
+
 			}else{
 				//상품상태값 변경
 				sqlMap.put("tmon", "E");
