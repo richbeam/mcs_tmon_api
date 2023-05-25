@@ -47,6 +47,52 @@ public class OrderScheduler {
 
 	//결제완료 주문건 신규 생성처리 [배송 대상 수집]
 	//@Scheduled(cron = "0 0/10 * * * *")
+	@Scheduled(initialDelay = 2000, fixedDelay = 9999999)
+	public void getOrderListManual() throws Exception {
+		logger.warn(">>>>>>>>>>> getOrderListManual 결제완료 시작");
+		//대상조회 - 접수된 주문 조회
+		RestParameters params = new RestParameters();
+		Map<String, Object> paramMap = new HashMap<>();
+		List<Map<String, Object>> orders = null;
+		//판매 날짜 설정
+		String path = "/orders";
+
+		String today = StringUtil.getTodayString("yyyy-MM-dd HH:mm");
+
+		String startDate = StringUtil.orderTimeAdd(today, -1530);
+		String endDate = StringUtil.orderTimeAdd(today, -40);
+		logger.warn("-----startDate : endDate = {} : {}",startDate,endDate);
+
+
+		params.setPathVariableParameters(paramMap);
+		params.setRequestParameters(paramMap);
+		paramMap.put("startDate", "2023-05-22 01:00");  // endDate 기준 7일 이내
+		paramMap.put("endDate", "2023-05-22 23:00");	  //현재시간 - 30 분보다 과거
+		paramMap.put("deliveryStatus", "D1");   //D1, D2 만 가능
+
+		params.setBody(paramMap);
+
+		orders = connector.callList(HttpMethod.GET, path, params);
+
+		//주문등록
+		if(orders != null) {
+			//logger.warn(">>> requestOrders 있음: today {} / orders {}", today, orders);
+			for(Map<String, Object> order : orders) {
+				try {
+					orderService.registOrders(order);
+				} catch (Exception e) {
+					e.printStackTrace();
+					//logger.warn(">>> requestOrders error {}", e.getMessage());
+				}
+			}
+		} else {
+			logger.warn(">>> getOrderListManual 없음: {}", orders);
+		}
+		logger.warn(">>>>>>>>>>> getOrderListManual 결제완료 종료");
+	}
+
+	//결제완료 주문건 신규 생성처리 [배송 대상 수집]
+	//@Scheduled(cron = "0 0/10 * * * *")
 	@Scheduled(initialDelay = 2000, fixedDelay = 160000)
 	public void getOrderList() throws Exception {
 		logger.warn(">>>>>>>>>>> getOrderList 결제완료 시작");
