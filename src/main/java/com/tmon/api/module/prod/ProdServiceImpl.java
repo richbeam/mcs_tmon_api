@@ -840,7 +840,7 @@ public class ProdServiceImpl implements ProdService {
 			String path = "/deals";
 			RestParameters params = new RestParameters();
 			params.setBody(product);
-			logger.warn("::::::::::::::::::::::insert request = "+product.toString());
+			//logger.warn("::::::::::::::::::::::insert request = "+product.toString());
 			Map<String, Object> response = null;
 			if(product.get("tStatus").equals("FAIL")){
 				logger.error(":::::: insert 상품 매핑시 오류 발생 ::"+product.toString());
@@ -1069,7 +1069,7 @@ public class ProdServiceImpl implements ProdService {
 				//판매 수정 처리
 				path = "/deals/"+ newProduct.get("productcd").toString();
 				params.setBody(product);
-				logger.warn("::::::::::::::::::::::update request = "+product.toString());
+				//logger.warn("::::::::::::::::::::::update request = "+product.toString());
 				if(product.get("tStatus").equals("FAIL")){
 					logger.error("::::::update 상품 매핑시 오류 발생 ::"+product.toString());
 				}else{

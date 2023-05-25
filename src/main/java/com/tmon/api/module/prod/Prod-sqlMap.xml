@@ -154,7 +154,7 @@
 			  --	 ON sc.catecd = cp.catecd
 			  --	AND sc.api_YN ='Y'
 		 WHERE 1=1
-		 AND EXISTS(select 1 from tmon_products where productcd = cp.productcd )
+		 --AND EXISTS(select 1 from tmon_products where productcd = cp.productcd )
 		   <!-- AND cs.sellercd in (select sellercd from tmon_sellers) -->
 		  /* AND ( cp.isusedproductoption = 0
 				  OR (cp.ISUSEDPRODUCTOPTION IN (1,2) AND cp.productcd NOT IN (
