@@ -91,8 +91,10 @@
 			<if test="productCd != null and productCd != ''">
 				AND cp.productcd = #{productCd}::NUMERIC
 			</if>
+			<if test="productCd == null and productCd == ''">
+				AND cp.tmon = 'N'						/* N : 신규 */
+			</if>
 			AND cs.tmon IN ('Y', 'R')
-			AND cp.tmon = 'N'						/* N : 신규 */
 			AND cp.status = '02'					/* STATUS 02 : 판매중 */
 			AND cs.seller_type_cd='10'				/* seller_type_cd  : 10:사업자 판매회원, 20:글로벌 판매회원(해외사업자) */
 			AND cs.OVERSEAS_GOODS_SALES_YN ='N'		/* OVERSEAS_GOODS_SALES_YN : Y:해외배송,N:국내배송 */
@@ -144,9 +146,11 @@
 				<if test="productCd != null and productCd != ''">
 					AND cp.productcd = #{productCd}::NUMERIC
 				</if>
+				<if test="productCd == null and productCd == ''">
+					AND cp.tmon = 'U'						/* N : 수정 */
+				</if>
 				--AND (cp.shippingfee = 0  OR (cp.shippingfee > 0 AND cp.supplyprice >= 7000))
 				AND cs.tmon IN ('Y', 'R')
-				AND cp.tmon = 'U'						/* N : 수정 */
 				AND cs.seller_type_cd='10'				/* seller_type_cd  : 10:사업자 판매회원, 20:글로벌 판매회원(해외사업자) */
 				AND cs.OVERSEAS_GOODS_SALES_YN ='N'		/* OVERSEAS_GOODS_SALES_YN : Y:해외배송,N:국내배송 */
 			   LEFT JOIN tmon_deliverycorp td on cs.shippingcompanycd = td.mdeliverycorpcd::NUMERIC

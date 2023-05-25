@@ -951,6 +951,11 @@ public class ProdServiceImpl implements ProdService {
 					basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
 				}catch (Exception e1){
 					e1.printStackTrace();
+                    sqlMap.put("tmon", "N");
+                    basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
+                    result.put("status", "03"); //오류
+                    result.put("contents", "상품등록 (이미 등록된 상품 체크) 오류발생 : " + e.getMessage());
+                    return result;
 				}
 
 
