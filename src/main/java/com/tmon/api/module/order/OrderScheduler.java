@@ -66,8 +66,8 @@ public class OrderScheduler {
 
 		params.setPathVariableParameters(paramMap);
 		params.setRequestParameters(paramMap);
-		paramMap.put("startDate", "2023-05-22 01:00");  // endDate 기준 7일 이내
-		paramMap.put("endDate", "2023-05-22 23:00");	  //현재시간 - 30 분보다 과거
+		paramMap.put("startDate", "2023-05-21 01:00");  // endDate 기준 7일 이내
+		paramMap.put("endDate", "2023-05-21 23:59");	  //현재시간 - 30 분보다 과거
 		paramMap.put("deliveryStatus", "D1");   //D1, D2 만 가능
 
 		params.setBody(paramMap);
