@@ -178,9 +178,9 @@ public class ProdServiceImpl implements ProdService {
 						deliveryFeePolicy ="FREE";
 					}else if(mProduct.get("shippingfeetype").toString().equals("02")){
 						deliveryFeePolicy ="PER";
-					}else if(mProduct.get("shippingfeetype").toString().equals("03") && mProduct.get("shippingfeepaytype").toString().equals("03")){
+					}else if(mProduct.get("shippingfeetype").toString().equals("03")){
 						deliveryFeePolicy ="AFTER";
-					}else if(mProduct.get("shippingfeetype").toString().equals("04") && mProduct.get("shippingfeepaytype").toString().equals("03")){
+					}else if(mProduct.get("shippingfeetype").toString().equals("04") && mProduct.get("shippingfeepaytype").toString().equals("04")){
 						deliveryFeePolicy ="CONDITION";
 					}
 					request.put("deliveryFeePolicy",deliveryFeePolicy);					//	DeliveryFeePolicy	배송비 정책 타입	O FREE : 무료배송, CONDITION : 조건부무료배송, PER : 선불, AFTER : 착불
