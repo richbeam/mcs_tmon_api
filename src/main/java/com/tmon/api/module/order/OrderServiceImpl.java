@@ -180,8 +180,14 @@ public class OrderServiceImpl implements OrderService{
 			}
 			commOrderMap.put("recvaddress1", StringUtil.decryption(receiverAddress.get("address").toString()));
 			commOrderMap.put("recvaddress2", StringUtil.decryption(receiverAddress.get("addressDetail").toString()));
-			commOrderMap.put("recvrnaddress1", StringUtil.decryption(receiverAddress.get("streetAddress").toString()));
-			commOrderMap.put("recvrnaddress2", StringUtil.decryption(receiverAddress.get("addressDetail").toString()));
+			if(receiverAddress.containsKey("streetAddress")){
+				commOrderMap.put("recvrnaddress1", StringUtil.decryption(receiverAddress.get("streetAddress").toString()));
+				commOrderMap.put("recvrnaddress2", StringUtil.decryption(receiverAddress.get("addressDetail").toString()));
+			}else{
+				commOrderMap.put("recvrnaddress1", StringUtil.decryption(receiverAddress.get("address").toString()));
+				commOrderMap.put("recvrnaddress2", StringUtil.decryption(receiverAddress.get("addressDetail").toString()));
+			}
+
 
 
 			//배송메세지
