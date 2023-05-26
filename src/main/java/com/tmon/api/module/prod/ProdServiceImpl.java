@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.melchi.common.util.ApiKafkaClient;
 import com.melchi.common.vo.RestParameters;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
@@ -43,7 +44,11 @@ public class ProdServiceImpl implements ProdService {
 	@Autowired
 	LogUtil logUtil;
 
-
+	/**
+	 * 카프카 클라이언트
+	 */
+	@Autowired
+	private ApiKafkaClient apiKafkaClient;
 
 	/**
 	 * 배송지 등록
@@ -992,7 +997,8 @@ public class ProdServiceImpl implements ProdService {
 			result.put("status", "03"); //오류
 			result.put("contents", "상품등록 오류발생 : " + e.getMessage());
 		}
-		
+
+		this.apiKafkaClient.sendApiSyncProductHistoryMessage(result);
 		return result;
 	}
 
@@ -1232,6 +1238,7 @@ public class ProdServiceImpl implements ProdService {
 			e.printStackTrace();
 		}
 		
+		this.apiKafkaClient.sendApiSyncProductHistoryMessage(result);
 		return result;
 	}
 
