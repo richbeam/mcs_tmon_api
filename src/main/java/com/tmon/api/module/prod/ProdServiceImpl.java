@@ -854,14 +854,14 @@ public class ProdServiceImpl implements ProdService {
 			if(null == response) {
 				//상품상태값 변경
 				sqlMap.put("tmon", "E");
-				//basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
+				basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
 				
 				//임시옵션삭제
 				//basicSqlSessionTemplate.update("ProdMapper.deleteTempTmonProductOpt", sqlMap);
 				
 				//로그 생성
 				logMap.put("content", product.toString());
-				//logUtil.insertProdScheduleFailLog(logMap);
+				logUtil.insertProdScheduleFailLog(logMap);
 				
 				//결과생성
 				result.put("status", "03"); //오류
@@ -909,6 +909,8 @@ public class ProdServiceImpl implements ProdService {
 			//결과생성
 			result.put("productno", dealNo.toString());
 			result.put("contents", "상품등록 성공");
+
+			logger.warn("::::: 상품 등록 SUCCESS ::::::: {}",newProduct.get("productcd").toString());
 		} catch (UserDefinedException e) {
 
 			logger.error("u상품 등록 예외발생 : {}", e.getMessage().toString());
@@ -980,7 +982,7 @@ public class ProdServiceImpl implements ProdService {
 			logger.error("상품 등록 예외발생 : ", e.getMessage());
 			//상품상태값 변경
 			sqlMap.put("tmon", "E");
-			//basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
+			basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
 			
 			//로그 생성
 			logMap.put("content", e.getMessage());
@@ -1175,7 +1177,7 @@ public class ProdServiceImpl implements ProdService {
 				//옵션 동기화
 				sqlMap.put("supplyprice", mProduct.get("supplyprice"));
 				basicSqlSessionTemplate.insert("ProdMapper.updateTmonProducts", sqlMap);
-				logger.info("::::: 상품 수정 SUCCESS ::::::: {}",newProduct.get("productcd").toString());
+				logger.warn("::::: 상품 수정 SUCCESS ::::::: {}",newProduct.get("productcd").toString());
 			}
 
 
