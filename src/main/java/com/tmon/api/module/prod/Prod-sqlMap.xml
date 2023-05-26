@@ -109,7 +109,6 @@
 		  INNER JOIN COMM_CATEGORIES cc2 ON  cc2.cateCd = cc3.refCateCd
 		  INNER JOIN COMM_CATEGORIES cc1 ON  cc1.cateCd = cc2.refCateCd and cc1.cateCd not in (7,8)*/
 		 WHERE 1=1
-		   AND
 		   AND NOT EXISTS(select 1 from tmon_products where productcd = cp.productcd )
 		   AND cp.productname not like '%로얄%'
 		   AND cp.overseas_goods_sales_yn = 'N'
@@ -150,9 +149,7 @@
 				<if test="productCd != null and productCd != ''">
 					AND cp.productcd = #{productCd}::NUMERIC
 				</if>
-				<if test="productCd == null and productCd == ''">
-					AND cp.tmon = 'U'						/* N : 수정 */
-				</if>
+				AND cp.tmon = 'U'						/* N : 수정 */
 				--AND (cp.shippingfee = 0  OR (cp.shippingfee > 0 AND cp.supplyprice >= 7000))
 				AND cs.tmon IN ('Y', 'R')
 				AND cs.seller_type_cd='10'				/* seller_type_cd  : 10:사업자 판매회원, 20:글로벌 판매회원(해외사업자) */
@@ -162,7 +159,7 @@
 			  --	 ON sc.catecd = cp.catecd
 			  --	AND sc.api_YN ='Y'
 		 WHERE 1=1
-		 --AND EXISTS(select 1 from tmon_products where productcd = cp.productcd )
+		 AND EXISTS(select 1 from tmon_products where productcd = cp.productcd )
 		   <!-- AND cs.sellercd in (select sellercd from tmon_sellers) -->
 		  /* AND ( cp.isusedproductoption = 0
 				  OR (cp.ISUSEDPRODUCTOPTION IN (1,2) AND cp.productcd NOT IN (
@@ -177,7 +174,7 @@
 					 ))
 				)
 		   AND cp.shippingfeepaytype != '03'*/
-			  LIMIT 1000 OFFSET 0
+			  LIMIT 500 OFFSET 0
 	</select>
 	
 	<!-- TMON 상품금액수정(재고, 가격, 상태변경)건 조회 -->
