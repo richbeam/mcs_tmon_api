@@ -324,7 +324,13 @@ public class OrderServiceImpl implements OrderService{
 						if(cnt == 0){
 							cnt = 1;
 						}
-						shipamount = (Integer.parseInt(mProduct.get("shippingfee").toString()) * ((qty/cnt)+1)) + Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim());
+						int ShipCnt = 0;
+						if(qty/cnt == 0 ){
+							ShipCnt = 1;
+						}else{
+							ShipCnt = qty/cnt;
+						}
+						shipamount = (Integer.parseInt(mProduct.get("shippingfee").toString()) * ShipCnt) + Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim());
 						amount  = amount - shipamount;
 						sellingprice  = sellingprice - shipamount;
 					}else {
