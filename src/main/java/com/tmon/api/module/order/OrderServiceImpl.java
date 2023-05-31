@@ -331,7 +331,7 @@ public class OrderServiceImpl implements OrderService{
 							ShipCnt = qty/cnt;
 						}
 						shipamount = (Integer.parseInt(mProduct.get("shippingfee").toString()) * ShipCnt) + Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim());
-						amount  = amount - shipamount;
+						amount  = amount;
 						sellingprice  = sellingprice - Integer.parseInt(mProduct.get("shippingfee").toString());
 					}else {
 						//배송비 셋팅
