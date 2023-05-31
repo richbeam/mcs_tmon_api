@@ -215,7 +215,9 @@
 			 , optionitemdetail
 			 , optionprice
 		  FROM comm_product_opts
-		 WHERE productoptioncd = #{productoptioncd}::NUMERIC
+		 WHERE productcd =  #{productcd}::NUMERIC
+           and concat(optionitem,optionitemdetail) = #{dealOptionTitle}
+		limit 1
 	</select>
 	
 	<!-- 주문조회등록 -->

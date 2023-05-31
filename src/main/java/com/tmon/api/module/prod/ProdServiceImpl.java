@@ -540,12 +540,12 @@ public class ProdServiceImpl implements ProdService {
 												//DealOption.put("title", dept1.get("optionitem").toString()+dept1.get("optionitemdetail").toString());						//	String(1..100)	상품명	X		생략가능, 단 title 또는 sections 둘중 1개는 필수
 												DealOption.put("sections",sections);					//	List<String(1..10)>	분류정보	X		딜 분류와 동일 사이즈 , 1개 섹션당 100자 제한
 
-												supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString())+Integer.parseInt(dept1.get("optionprice").toString())+Integer.parseInt(dept2.get("optionprice").toString())+Integer.parseInt(dept3.get("optionprice").toString()));
+												/*supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString())+Integer.parseInt(dept1.get("optionprice").toString())+Integer.parseInt(dept2.get("optionprice").toString())+Integer.parseInt(dept3.get("optionprice").toString()));
 												tmonsellingprice = supplyprice.divide(new BigDecimal(0.89), -1, BigDecimal.ROUND_UP);
 												price = Integer.parseInt(String.valueOf(Math.round(tmonsellingprice.doubleValue())));
-												logger.warn("====================tmonsellingprice::"+tmonsellingprice.doubleValue());
+												logger.warn("====================tmonsellingprice::"+tmonsellingprice.doubleValue());*/
 
-												DealOption.put("salesPrice",price);				//	Integer+	판매가(단가)	O		0원 등록불가
+												DealOption.put("salesPrice",price+Integer.parseInt(dept1.get("optionprice").toString())+Integer.parseInt(dept2.get("optionprice").toString())+Integer.parseInt(dept3.get("optionprice").toString()));				//	Integer+	판매가(단가)	O		0원 등록불가
 												//등록일 경우에만 제고 추가
 												if(tType.equals("I")) {
 													DealOption.put("stock", Integer.parseInt(dept1.get("optionqty").toString()));                        //	Integer+	재고	O
@@ -574,11 +574,11 @@ public class ProdServiceImpl implements ProdService {
 										//DealOption.put("title", dept1.get("optionitem").toString()+dept1.get("optionitemdetail").toString());						//	String(1..100)	상품명	X		생략가능, 단 title 또는 sections 둘중 1개는 필수
 										DealOption.put("sections",sections);					//	List<String(1..10)>	분류정보	X		딜 분류와 동일 사이즈 , 1개 섹션당 100자 제한
 
-										supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString())+Integer.parseInt(dept1.get("optionprice").toString())+Integer.parseInt(dept2.get("optionprice").toString()));
+										/*supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString())+Integer.parseInt(dept1.get("optionprice").toString())+Integer.parseInt(dept2.get("optionprice").toString()));
 										tmonsellingprice = supplyprice.divide(new BigDecimal(0.89), -1, BigDecimal.ROUND_UP);
 										price = Integer.parseInt(String.valueOf(Math.round(tmonsellingprice.doubleValue())));
-										logger.warn("====================tmonsellingprice::"+tmonsellingprice.doubleValue());
-										DealOption.put("salesPrice",price);				//	Integer+	판매가(단가)	O		0원 등록불가
+										logger.warn("====================tmonsellingprice::"+tmonsellingprice.doubleValue());*/
+										DealOption.put("salesPrice",price+Integer.parseInt(dept1.get("optionprice").toString())+Integer.parseInt(dept2.get("optionprice").toString()));				//	Integer+	판매가(단가)	O		0원 등록불가
 										//등록일 경우에만 제고/노출여부 추가
 										if(tType.equals("I")) {
 											DealOption.put("stock", Integer.parseInt(dept1.get("optionqty").toString()));                        //	Integer+	재고	O
@@ -603,12 +603,12 @@ public class ProdServiceImpl implements ProdService {
 							//DealOption.put("sections","");					//	List<String(1..10)>	분류정보	X		딜 분류와 동일 사이즈 , 1개 섹션당 100자 제한
 							//DealOption.put("price","");						//	Integer+	가격	X	salesPrice	현정책 기준 salesPrice와 동일해야 함
 
-							supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString())+Integer.parseInt(dept1.get("optionprice").toString()));
+							/*supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString())+Integer.parseInt(dept1.get("optionprice").toString()));
 							tmonsellingprice = supplyprice.divide(new BigDecimal(0.89), -1, BigDecimal.ROUND_UP);
 							price = Integer.parseInt(String.valueOf(Math.round(tmonsellingprice.doubleValue())));
-							logger.warn("====================tmonsellingprice::"+tmonsellingprice.doubleValue());
+							logger.warn("====================tmonsellingprice::"+tmonsellingprice.doubleValue());*/
 
-							DealOption.put("salesPrice",price);				//	Integer+	판매가(단가)	O		0원 등록불가
+							DealOption.put("salesPrice",price+Integer.parseInt(dept1.get("optionprice").toString()));				//	Integer+	판매가(단가)	O		0원 등록불가
 							//등록일 경우에만 제고/노출여부 추가
 							if(tType.equals("I")) {
 								DealOption.put("stock", Integer.parseInt(dept1.get("optionqty").toString()));                        //	Integer+	재고	O

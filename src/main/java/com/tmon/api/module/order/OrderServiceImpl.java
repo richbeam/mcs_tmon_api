@@ -398,7 +398,13 @@ public class OrderServiceImpl implements OrderService{
 						//수량
 						commOrderDeOptsMap.put("qty", opt.get("qty"));
 						//옵션가격 -- 티몬은 deal가격에 옵션 추가금을 합산하여 판매 하기때문에 멸치에서는 추가금액이 보이지 않음
-						commOrderDeOptsMap.put("optionprice", "0");
+						opt.put("productcd", mProduct.get("productcd"));
+						Map<String, Object> mProductOpt = basicSqlSessionTemplate.selectOne("OrderMapper.selectProductOpt", opt);
+						if(mProductOpt != null){
+							commOrderDeOptsMap.put("optionprice", mProductOpt.get("optionprice").toString());
+						}else{
+							commOrderDeOptsMap.put("optionprice", "0");
+						}
 						// 옵션명
 						commOrderDeOptsMap.put("optionitem", opt.get("dealOptionTitle").toString());
 						//옵션순번
