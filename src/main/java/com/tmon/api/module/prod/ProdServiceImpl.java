@@ -476,8 +476,10 @@ public class ProdServiceImpl implements ProdService {
 				shippingfee = 0;
 			}
 			supplyprice = supplyprice.add(new BigDecimal(shippingfee));
-			*/
-			supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString()));
+
+			supplyprice = new BigDecimal(Integer.parseInt(mProduct.get("supplyprice").toString()));*/
+
+
 			BigDecimal tmonsellingprice = supplyprice.divide(new BigDecimal(0.89), -1, BigDecimal.ROUND_UP);
 			price = Integer.parseInt(String.valueOf(Math.round(tmonsellingprice.doubleValue())));
 			logger.warn("====================tmonsellingprice::"+tmonsellingprice.doubleValue());
