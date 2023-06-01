@@ -661,7 +661,9 @@ public class ProdServiceImpl implements ProdService {
 			product.put("dealOptions",dealOptions);               		// List<DealOption>(1..200)    옵션들 O       옵션은 200개까지만 가능
 
 			//
+			product.put("sellingprice",price);
 
+			//
 			String managedTitle = productNm;
 			if(managedTitle.length() > 60){
 				managedTitle = managedTitle.substring(0,60);
@@ -867,6 +869,8 @@ public class ProdServiceImpl implements ProdService {
 			//상품매핑 처리
 			Map<String, Object> product = getProducts(mProduct, tmonProduct, mSeller, optionGroup, optionList,"I");
 
+			result.put("sellingprice",product.get("sellingprice"));
+			product.remove("sellingprice");
 			//배송지 ,반품지 신규등록
 
 			String path = "/deals";
@@ -1110,6 +1114,8 @@ public class ProdServiceImpl implements ProdService {
 
 				//상품매핑
 				Map<String, Object> product = getProducts(mProduct, tmonProduct, mSeller, optionGroup,optionList,"U");
+				result.put("sellingprice",product.get("sellingprice"));
+				product.remove("sellingprice");
 				result.put("supplyprice", mProduct.get("supplyprice"));
 				//판매 수정 처리
 				path = "/deals/"+ newProduct.get("productcd").toString();
@@ -1219,7 +1225,8 @@ public class ProdServiceImpl implements ProdService {
 			}
 
 			result.put("supplyprice", mProduct.get("supplyprice"));
-
+			result.put("sellingprice", mProduct.get("supplyprice"));
+			result.put("status", "02"); //성공
 
 			sqlMap.put("tmon", "Y");
 			basicSqlSessionTemplate.update("ProdMapper.updateProducts", sqlMap);
