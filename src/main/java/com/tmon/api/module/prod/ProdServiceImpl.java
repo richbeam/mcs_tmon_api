@@ -187,6 +187,7 @@ public class ProdServiceImpl implements ProdService {
 						deliveryFeePolicy ="AFTER";
 					}else if(mProduct.get("shippingfeetype").toString().equals("04") && mProduct.get("shippingfeepaytype").toString().equals("04")){
 						deliveryFeePolicy ="CONDITION";
+						request.put("deliveryFeeFreePrice",Integer.parseInt(mProduct.get("freeshippingamount").toString()));					//	Integer+	조건부 무료배송 기준 금액 (원)	V		배송비정책이 조건부무료배송(CONDITION)일때 필수
 					}
 					request.put("deliveryFeePolicy",deliveryFeePolicy);					//	DeliveryFeePolicy	배송비 정책 타입	O FREE : 무료배송, CONDITION : 조건부무료배송, PER : 선불, AFTER : 착불
 
@@ -197,10 +198,10 @@ public class ProdServiceImpl implements ProdService {
 						request.put("deliveryFee",Integer.parseInt(mProduct.get("shippingfee").toString()));							//	Integer+	배송비 금액 (원)	O
 					}
 
-					request.put("deliveryFeeFreePrice",Integer.parseInt(mProduct.get("freeshippingamount").toString()));					//	Integer+	조건부 무료배송 기준 금액 (원)	V		배송비정책이 조건부무료배송(CONDITION)일때 필수
+
 					request.put("productType",mProduct.get("productType"));							//	ProductType	배송 상품타입	O		딜 등록시 productType과 반드시 일치
 					request.put("deliveryType",mProduct.get("deliveryType"));							//	DeliveryType	배송 타입 (당일/익일/예외/종료)	O
-					request.put("ddayDeliveryTime","");						//	String	당일발송시간	V		배송타입이 당일(DD)배송인 경우 필수
+					//request.put("ddayDeliveryTime","");						//	String	당일발송시간	V		배송타입이 당일(DD)배송인 경우 필수
 
 					//도서산간 추가 배송비 셋팅
 					if(Integer.parseInt(mProduct.get("additionalshippingfee").toString()) > 0){
