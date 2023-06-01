@@ -207,9 +207,25 @@ public class ProdController {
 					response.setResultMessage("상품수정 : " +resultMap.toString());
 					logger.warn("단건 상품 수정/등록 :: 상품수정 ::" + productCd + resultMap.toString());
 				}else{ // 오류
-					response.setResultCode(200);
-					response.setResultMessage(productCd + " 상품이 아직 등록할수 없는 상태 입니다.");
-					logger.warn("단건 상품 수정/등록 :: 상품이 아직 등록할수 없는 상태 입니다.::" + productCd + resultMap.toString());
+
+                    List<Map<String, Object>> delResult = basicSqlSessionTemplate.selectList("ProdMapper.selectUpdatedProductsDelChk", paramMap);
+                    if(delResult.size() > 0){
+                        int cnt = 0;
+                        while (cnt < delResult.size()) {
+                            prodService.setStopProduct(delResult.get(cnt).get("productcd").toString());
+                            cnt ++;
+                        }
+                        response.setResultCode(200);
+                        response.setResultMessage(productCd + " 상품이 판매 일시중지 되었습니다.[티몬연동 해제]");
+                        logger.warn("단건 상품 수정/등록 :: 상품이 판매 일시중지 되었습니다.[티몬연동 해제]::" + productCd + resultMap.toString());
+                    }else{
+                        response.setResultCode(200);
+                        response.setResultMessage(productCd + " 상품이 아직 등록할수 없는 상태 입니다.");
+                        logger.warn("단건 상품 수정/등록 :: 상품이 아직 등록할수 없는 상태 입니다.::" + productCd + resultMap.toString());
+                    }
+
+
+
 				}
 			}
 		}catch (Exception e){

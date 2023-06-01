@@ -28,7 +28,11 @@ public interface ProdService {
 	 */
 	public Map<String, Object> updateProducts(Map<String, Object> newProduct);
 
-
+    /**
+     * 딜 판매 일시중지
+     * @param productcd
+     */
+    public void setStopProduct(String productcd);
 	/**
 	 * 상품QnA 등록 [ 상품문의 조회 ]
 	 * @param qna

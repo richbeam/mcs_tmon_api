@@ -176,6 +176,39 @@
 		   AND cp.shippingfeepaytype != '03'*/
 			  LIMIT 500 OFFSET 0
 	</select>
+
+	<!-- TMON 상품수정 대상 목록 조회 -->
+	<select id="selectUpdatedProductsDelChk" parameterType="hashMap" resultType="hashMap" fetchSize="1000">
+		/* ProdMapper.selectUpdatedProductsDelChk */
+		SELECT cp.productcd
+		, cp.sellercd
+		, cp.status
+		FROM comm_sellers cs
+		INNER JOIN comm_products cp
+		ON cp.sellercd = cs.sellercd
+		AND cp.productcd = #{productCd}::NUMERIC
+		AND cs.tmon IN ('D')
+		AND cs.seller_type_cd='10'				/* seller_type_cd  : 10:사업자 판매회원, 20:글로벌 판매회원(해외사업자) */
+		AND cs.OVERSEAS_GOODS_SALES_YN ='N'		/* OVERSEAS_GOODS_SALES_YN : Y:해외배송,N:국내배송 */
+
+		WHERE 1=1
+		AND EXISTS(select 1 from tmon_products where productcd = cp.productcd )
+		LIMIT 500 OFFSET 0
+	</select>
+
+
+
+	<!-- TMON 상품수정 판매 일시 중지 처리  -->
+	<select id="selectSetStopProduct" parameterType="hashMap" resultType="hashMap">
+		/* ProdMapper.selectSetStopProduct */
+		SELECT C.productcd
+		FROM comm_sellers S
+		inner join comm_products p on S.sellercd = P.sellercd
+		inner join tmon_products C on P.productcd = C.productcd and coalesce(C.status,'Y') != 'D'
+		WHERE S.tmon ='D'
+		  AND coalesce(D.sellertmon,'') != coalesce(C.tmon,'')
+		limit 500
+	</select>
 	
 	<!-- TMON 상품금액수정(재고, 가격, 상태변경)건 조회 -->
 	<select id="selectProductsChange" parameterType="hashMap" resultType="hashMap" fetchSize="500">
@@ -246,17 +279,14 @@
 				SELECT sellercd
 					 , tmon as sellertmon
 				  FROM comm_sellers 
-				 WHERE tmon IN ('D','R') 
-				   AND shippingcompanycd is not null 
-				   AND returnaddress1 is not null
+				 WHERE tmon IN ('D')
 			)
 			SELECT B.*
 				 , A.*
 			  FROM comm_products A
 				 , with_tab B
 			 WHERE A.sellercd = B.sellercd
-			   AND A.api_yn = 'Y'
-			   AND ((A.shippingfee = 0 OR A.shippingfee IS NULL) OR (A.shippingfee > 0 AND A.supplyprice >= 7000))
+
 		)
 		SELECT C.productno
 			 , D.* 
@@ -364,7 +394,7 @@
 	<!-- TMON 상품 목록 조회 -->
 	<select id="selectTmonProducts" parameterType="hashMap" resultType="hashMap"> 
 	/* ProdMapper.selectTmonProducts */
-		SELECT *
+		SELECT productcd,  productno,  supplyprice,  tmon,  coalesce(status,'Y') as status
 		  FROM tmon_products
 		 WHERE 1=1
 		 <if test="productcd != null and productcd != ''">
@@ -388,6 +418,24 @@
 		   </if>
 		 WHERE productcd = #{productcd}::NUMERIC
 	</update>
+
+	<!-- TMON 상품 판매중지  수정 -->
+	<update id="updateTmonProductsPause" parameterType="hashMap">
+		/* ProdMapper.updateTmonProductsPause */
+		UPDATE tmon_products
+		SET modifydate = now()
+		,status = 'D'
+		WHERE productcd = #{productcd}::NUMERIC
+	</update>
+	<!-- TMON 상품 판매중지  수정 -->
+	<update id="updateTmonProductsResume" parameterType="hashMap">
+		/* ProdMapper.updateTmonProductsResume */
+		UPDATE tmon_products
+		SET modifydate = now()
+		  ,status = ''
+		WHERE productcd = #{productcd}::NUMERIC
+	</update>
+
 	
 	<!-- TMON 업체 배송비 정책 조회 -->
 	<select id="selectTmonShippingPolicy" parameterType="hashMap" resultType="hashMap"> 

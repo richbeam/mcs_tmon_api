@@ -269,11 +269,18 @@ public class ProdServiceImpl implements ProdService {
 			//판매 일지 정지
 			path = "/deals/"+ productcd +"/pause";
 			response = connector.call(HttpMethod.PUT, path, params);
+
+
+			Map<String, Object> sqlMap = new HashMap<>();
+			sqlMap.put("productcd", productcd);
+			basicSqlSessionTemplate.insert("ProdMapper.updateTmonProductsPause", sqlMap);
 			logger.warn("------수정 실패로 인한 판매일시중지 완료 99 : ");
 		}catch (Exception e){
 			e.printStackTrace();
 		}
 	}
+
+
 
 
 	/**
@@ -890,6 +897,7 @@ public class ProdServiceImpl implements ProdService {
 				//결과생성
 				result.put("status", "03"); //오류
 				result.put("contents", product.toString());
+				this.apiKafkaClient.sendApiSyncProductHistoryMessage(result);
 				return result;
 			}
 			Long dealNo = Long.parseLong(((Map<String, Object>)response.get("dealNo")).get(newProduct.get("productcd").toString()).toString());
@@ -1092,12 +1100,16 @@ public class ProdServiceImpl implements ProdService {
 				sqlMap.put("tmon", "D");
 			}else{
 				//판매 재개 및 수정
-				path = "/deals/"+ newProduct.get("productcd").toString()+"/resume";
-				response = connector.call(HttpMethod.PUT, path, params);
-				logger.warn("------판매 재개 완료 : ");
+				if(tmonProduct.get("stauts").toString().equals("D")){
+					path = "/deals/"+ newProduct.get("productcd").toString()+"/resume";
+					response = connector.call(HttpMethod.PUT, path, params);
+					basicSqlSessionTemplate.update("ProdMapper.updateTmonProductsResume", sqlMap);
+					logger.warn("------판매 재개 완료 : ");
+				}
+
 				//상품매핑
 				Map<String, Object> product = getProducts(mProduct, tmonProduct, mSeller, optionGroup,optionList,"U");
-
+				result.put("supplyprice", mProduct.get("supplyprice"));
 				//판매 수정 처리
 				path = "/deals/"+ newProduct.get("productcd").toString();
 				params.setBody(product);
@@ -1205,7 +1217,7 @@ public class ProdServiceImpl implements ProdService {
 				logger.warn("::::: 상품 수정 SUCCESS ::::::: {}",newProduct.get("productcd").toString());
 			}
 
-
+			result.put("supplyprice", mProduct.get("supplyprice"));
 
 
 			sqlMap.put("tmon", "Y");
@@ -1261,6 +1273,30 @@ public class ProdServiceImpl implements ProdService {
 		return result;
 	}
 
+
+	/**
+	 * 딜 판매 일시중지
+	 * @param productcd
+	 */
+	public void setStopProduct(String productcd){
+		try {
+			String path = "";
+			RestParameters params = new RestParameters();
+			Map<String, Object> response = null;
+			//판매 일지 정지
+			path = "/deals/"+ productcd +"/pause";
+			response = connector.call(HttpMethod.PUT, path, params);
+			logger.warn("------setStopProduct: ");
+
+			Map<String, Object> sqlMap = new HashMap<>();
+			sqlMap.put("productcd", productcd);
+			basicSqlSessionTemplate.insert("ProdMapper.updateTmonProductsPause", sqlMap);
+		}catch (Exception e){
+			logger.warn("-----------setStopProduct Error: ");
+			e.printStackTrace();
+
+		}
+	}
 
 	/**
 	 * 상품QnA 등록 [ 상품문의 조회 ]

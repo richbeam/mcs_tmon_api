@@ -107,6 +107,34 @@ public class ProdScheduler {
 		return null;
 	}
 
+    /**
+     * 상품 수정 [ 딜 판매 일시 중지 ]
+     * @return
+     * @throws Exception
+     */
+    //@Scheduled(cron="40 0/1 * * * ?")
+    @Scheduled(initialDelay = 19900, fixedDelay = 45000)
+    public Response setStopProducts() throws Exception {
+        logger.warn(">>>>>>>>>>> setStopProducts start");
+        //수정 대상건 조회
+        Map<String, Object> paramMap = new HashMap<>();
+        List<Map<String, Object>> products = basicSqlSessionTemplate.selectList("ProdMapper.selectSetStopProduct", paramMap);
+
+		if(products != null) {
+			for(Map<String, Object> product : products) {
+				try {
+					prodService.setStopProduct(product.get("productcd").toString());
+					logger.warn(":::::::::::::setStopProduct : {}",product.get("productcd").toString());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+        logger.warn(">>>>>>>>>>> setStopProducts end::::::");
+        return null;
+    }
+
 
 	/**
 	 * 상품QnA 등록 [ 상품문의 조회 ]
