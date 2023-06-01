@@ -185,12 +185,11 @@
 		, cp.status
 		FROM comm_sellers cs
 		INNER JOIN comm_products cp
-		ON cp.sellercd = cs.sellercd
+		ON  cp.sellercd = cs.sellercd
 		AND cp.productcd = #{productCd}::NUMERIC
 		AND cs.tmon IN ('D')
 		AND cs.seller_type_cd='10'				/* seller_type_cd  : 10:사업자 판매회원, 20:글로벌 판매회원(해외사업자) */
 		AND cs.OVERSEAS_GOODS_SALES_YN ='N'		/* OVERSEAS_GOODS_SALES_YN : Y:해외배송,N:국내배송 */
-
 		WHERE 1=1
 		AND EXISTS(select 1 from tmon_products where productcd = cp.productcd )
 		LIMIT 500 OFFSET 0
@@ -206,7 +205,6 @@
 		inner join comm_products p on S.sellercd = P.sellercd
 		inner join tmon_products C on P.productcd = C.productcd and coalesce(C.status,'Y') != 'D'
 		WHERE S.tmon ='D'
-		  AND coalesce(D.sellertmon,'') != coalesce(C.tmon,'')
 		limit 500
 	</select>
 	
