@@ -392,7 +392,7 @@
 	<!-- TMON 상품 목록 조회 -->
 	<select id="selectTmonProducts" parameterType="hashMap" resultType="hashMap"> 
 	/* ProdMapper.selectTmonProducts */
-		SELECT productcd,  productno,  supplyprice,  tmon,  coalesce(status,'Y') as status
+		SELECT productcd,  productno,  supplyprice,  tmon,  coalesce(status,'Y') as status, optgroupcnt
 		  FROM tmon_products
 		 WHERE 1=1
 		 <if test="productcd != null and productcd != ''">
