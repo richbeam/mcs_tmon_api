@@ -1101,7 +1101,7 @@ public class ProdServiceImpl implements ProdService {
 				sqlMap.put("tmon", "D");
 			}else{
 				//판매 재개 및 수정
-				if(tmonProduct.get("stauts").toString().equals("D")){
+				if(tmonProduct.get("status").toString().equals("D")){
 					path = "/deals/"+ newProduct.get("productcd").toString()+"/resume";
 					response = connector.call(HttpMethod.PUT, path, params);
 					basicSqlSessionTemplate.update("ProdMapper.updateTmonProductsResume", sqlMap);

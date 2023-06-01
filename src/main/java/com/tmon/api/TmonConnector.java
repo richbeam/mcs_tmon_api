@@ -146,7 +146,7 @@ public class TmonConnector {
 
 		//statusCode = String.valueOf(responseEntity.getStatusCode());
 		if(null != responseEntity){
-			logger.warn("responseEntity=" + responseEntity.toString());
+			//logger.warn("responseEntity=" + responseEntity.toString());
 		}
 
 		result = responseEntity.getBody();
@@ -248,7 +248,7 @@ public class TmonConnector {
 
 		//statusCode = String.valueOf(responseEntity.getStatusCode());
 		if(null != responseEntity){
-			logger.warn("responseEntity=" + responseEntity.toString());
+			//logger.warn("responseEntity=" + responseEntity.toString());
 		}
 
 		result = responseEntity.getBody();
@@ -310,7 +310,7 @@ public class TmonConnector {
 		String statusCode = null;
 		try {
 			responseEntity = restTemplate.exchange(requestEntity, String.class);
-			logger.warn("responseEntity 값 " + responseEntity.getBody());
+			//logger.warn("responseEntity 값 " + responseEntity.getBody());
 		} catch (HttpStatusCodeException e) {
 			// 통신 오류(서버에서 500에러 반환)
 			logger.warn("ERROR REQUEST : " + requestEntity.getBody().toString());
