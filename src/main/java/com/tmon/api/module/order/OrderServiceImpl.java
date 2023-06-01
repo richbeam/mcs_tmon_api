@@ -227,7 +227,7 @@ public class OrderServiceImpl implements OrderService{
 					List<Map<String,Object>> dealOptions = (List<Map<String,Object>>)deals.get("dealOptions");
 					//상품조회
 					Map<String, Object> mProduct = basicSqlSessionTemplate.selectOne("OrderMapper.selectProducts", deals);
-					sellercd = mProduct.get("sellercd").toString();
+
 					//멸치상품이 없을경우 티몬상품 조회를 해서 매핑테이블을 생성해 준다.
 					if (mProduct == null) {
 						logger.error(">>> 상품 매칭안됨 조회후 설정: {}", order.get("ordNo"),order.get("itemId"));
@@ -266,6 +266,8 @@ public class OrderServiceImpl implements OrderService{
 						}
 					}
 
+					
+					sellercd = mProduct.get("sellercd").toString();
 
 
 					////////////////////////////////////////////////////////////////comm_order_details Setting Start
