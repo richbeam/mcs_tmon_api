@@ -1225,7 +1225,6 @@ public class ProdServiceImpl implements ProdService {
 			}
 
 			result.put("supplyprice", mProduct.get("supplyprice"));
-			result.put("sellingprice", mProduct.get("supplyprice"));
 			result.put("status", "02"); //성공
 
 			sqlMap.put("tmon", "Y");
