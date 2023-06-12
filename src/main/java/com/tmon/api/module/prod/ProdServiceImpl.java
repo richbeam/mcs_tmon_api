@@ -180,6 +180,11 @@ public class ProdServiceImpl implements ProdService {
 					if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
 						deliveryTemplateName += "_"+mProduct.get("quantitycntuseyn").toString();
 					}
+					//마리오쇼핑일경우
+					if(seller.get("sellercd").toString().equals("435709")){
+						deliveryTemplateName += "_"+mProduct.get("shippolicy_no").toString();
+					}
+
 					logger.warn("------------ deliveryTemplateName : {}",deliveryTemplateName);
 					request.put("deliveryTemplateName",deliveryTemplateName);					//	String	관리 배송템플릿 명	O
 					//멸치쇼핑은 무조건 묶음배송 없음.

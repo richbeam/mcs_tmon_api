@@ -493,15 +493,6 @@
 			 , A.busitype
 			 , A.busicate
 
-			 /*, A.postcode1
-			 , COALESCE(A.postcode2,'') AS postcode2
-			 , A.address1
-			 , A.address2
-			 , A.returnpostcode1
-			 , COALESCE(A.returnpostcode2,'') AS returnpostcode2
-			 , A.returnaddress1
-			 , A.returnaddress2*/
-
 			 ,coalesce(C.postcode1, A.postcode1) AS postcode1
 			 ,coalesce(C.postcode2, COALESCE(A.postcode2,'')) AS postcode2
 			 ,coalesce(C.address1, A.address1) AS address1
@@ -510,7 +501,6 @@
 			 ,coalesce(C.returnpostcode2, COALESCE(A.returnpostcode2,'')) AS returnpostcode2
 			 ,coalesce(C.returnaddress1, A.returnaddress1) AS returnaddress1
 			 ,coalesce(C.returnaddress2, A.returnaddress2) AS returnaddress2
-
 
 			 , A.shippingtype
 			 , A.shippingcompanycd
