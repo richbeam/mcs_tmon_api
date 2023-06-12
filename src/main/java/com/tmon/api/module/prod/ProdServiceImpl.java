@@ -1102,6 +1102,12 @@ public class ProdServiceImpl implements ProdService {
 			if(null != tmonProduct) {
 				paramMap.put("productno", tmonProduct.get("productno"));
 			}
+			//마리오 쇼핑 배송비 분배 처리
+			if(mProduct.get("sellercd").toString().equals("435709")){
+				paramMap.put("shippolicy_no", mProduct.get("shippolicy_no").toString());
+			}else{
+				paramMap.put("shippolicy_no", "0");
+			}
 			// 판매자정보 조회
 			paramMap.put("sellercd", mProduct.get("sellercd").toString());
 			Map<String, Object> mSeller = basicSqlSessionTemplate.selectOne("ProdMapper.selectSeller", paramMap);
