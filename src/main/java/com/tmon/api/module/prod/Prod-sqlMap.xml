@@ -11,7 +11,7 @@
 		(
 		  	sellercd, no, partnerNo, type, addressName, defaultAddress, zipcode, address, addressDetail, streetAddress, managerName, managerPhone, available, regdate, modifydate,shippolicy_no
 		) VALUES (
-		 	#{sellercd}::NUMERIC, #{no}, #{partnerNo}, #{type}, #{addressName}, false, #{zipCode}, #{address}, #{addressDetail}, #{streetAddress}, #{managerName}, #{managerPhone}, true, now(), now(), #{shippolicy_no}
+		 	#{sellercd}::NUMERIC, #{no}, #{partnerNo}, #{type}, #{addressName}, false, #{zipCode}, #{address}, #{addressDetail}, #{streetAddress}, #{managerName}, #{managerPhone}, true, now(), now(), #{shippolicy_no}::NUMERIC
 		)
 	</insert>
 
