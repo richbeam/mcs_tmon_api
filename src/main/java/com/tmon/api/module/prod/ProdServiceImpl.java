@@ -77,7 +77,13 @@ public class ProdServiceImpl implements ProdService {
 				Map<String, Object> request = new HashMap<>();
 				seller.put("type",tp);
 				request.put("type",tp);					//String	타입(D: 배송지, R: 반송지)	O
-				request.put("addressName",seller.get("sellercd")+"_"+tp);			//String	관리주소명	O		다른관리주소명과 동일할 수 없음
+				//마리오쇼핑일 경우
+				if(seller.get("sellercd").toString().equals("435709")){
+					request.put("addressName",seller.get("sellercd").toString()+"_"+seller.get("shippolicy_no").toString()+"_"+tp);			//String	관리주소명	O		다른관리주소명과 동일할 수 없음
+				}else{
+					request.put("addressName",seller.get("sellercd").toString()+"_"+tp);			//String	관리주소명	O		다른관리주소명과 동일할 수 없음
+				}
+
 				if(tp.equals("D")){
 					address.put("zipCode",seller.get("postcode1")+""+seller.get("postcode2"));			//String	우편번호	O
 					address.put("address",seller.get("address1"));			//String	지번주소	O		우편번호에 해당하는 지번주소
@@ -103,6 +109,7 @@ public class ProdServiceImpl implements ProdService {
 					params.setBody(request);
 					Map<String, Object> result = connector.call(HttpMethod.POST, path, params);
 					result.put("sellercd",seller.get("sellercd")); //판매자 코드
+					result.put("shippolicy_no",seller.get("shippolicy_no")); // 배송지 코드
 					address = ((Map<String, Object>)result.get("address"));
 
 					result.put("zipCode",address.get("zipCode"));
@@ -123,6 +130,7 @@ public class ProdServiceImpl implements ProdService {
 					params.setBody(request);
 					Map<String, Object> result = connector.call(HttpMethod.PUT, path, params);
 					result.put("sellercd",seller.get("sellercd")); //판매자 코드
+					result.put("shippolicy_no",seller.get("shippolicy_no")); // 배송지 코드
 					address = ((Map<String, Object>)result.get("address"));
 
 					result.put("zipCode",address.get("zipCode"));
@@ -218,6 +226,12 @@ public class ProdServiceImpl implements ProdService {
 						//request.put("longDistanceDeliveryFeeExcludingJeju",0);	//	Integer+ (0..300000)	도서간간 제주 제외한 지역 추가 배송비	V		도서산간 배송가능여부와 도서산간 배송비 주문시결제여부가 true일 경우 필수
 						//request.put("longDistanceDeliveryDiscriptionMin","");	//	Integer+ (0..300000)	도서산간차등 추가 배송비 최소금액	V		도서산간 배송가능여부가 true이고, 도서산간 배송비 주문시결제여부가 false인경우 필수
 						//request.put("longDistanceDeliveryDiscriptionMax","");	//	Integer+ (0..300000)	도서산간차등 추가 배송비 최대금액	V		도서산간 배송가능여부가 true이고, 도서산간 배송비 주문시결제여부가 false인경우 필수
+					}
+
+					if(seller.get("sellercd").toString().equals("435709")){
+						seller.put("shippolicy_no",mProduct.get("shippolicy_no").toString());
+					}else{
+						seller.put("shippolicy_no","");
 					}
 
 					Map<String, Object> address = selectAddresses(seller);
@@ -489,7 +503,13 @@ public class ProdServiceImpl implements ProdService {
 
 
 			BigDecimal tmonsellingprice = supplyprice.divide(new BigDecimal(0.89), -1, BigDecimal.ROUND_UP);
-			price = Integer.parseInt(String.valueOf(Math.round(tmonsellingprice.doubleValue())));
+			//마리오 가격셋팅
+			if(mProduct.get("sellercd").toString().equals("435709")){
+				price = Integer.parseInt(mProduct.get("sellingprice").toString());
+			}else{
+				price = Integer.parseInt(String.valueOf(Math.round(tmonsellingprice.doubleValue())));
+			}
+
 			logger.warn("====================tmonsellingprice::"+tmonsellingprice.doubleValue());
 
 			/////////////////////////////////////////////////////////////////////////// 상품명 셋팅
@@ -846,6 +866,12 @@ public class ProdServiceImpl implements ProdService {
 			Map<String, Object> tmonProduct = basicSqlSessionTemplate.selectOne("ProdMapper.selectTmonProducts", paramMap);
 			if(tmonProduct != null) {
 				paramMap.put("productno", tmonProduct.get("productno"));
+			}
+			//마리오 쇼핑 배송비 분배 처리
+			if(mProduct.get("sellercd").toString().equals("435709")){
+				paramMap.put("shippolicy_no", mProduct.get("shippolicy_no").toString());
+			}else{
+				paramMap.put("shippolicy_no", "0");
 			}
 			// 판매자정보 조회
 			paramMap.put("sellercd", mProduct.get("sellercd").toString());
