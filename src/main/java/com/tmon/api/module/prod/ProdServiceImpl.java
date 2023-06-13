@@ -223,6 +223,9 @@ public class ProdServiceImpl implements ProdService {
 								deliveryTemplateName +="_"+mProduct.get("freeshippingamount").toString();
 
 							}
+							if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
+								deliveryTemplateName +="_QT";
+							}
 
 					//--수량별 배송비 무료배송 처리
 					if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
@@ -288,7 +291,7 @@ public class ProdServiceImpl implements ProdService {
 					if(seller.get("sellercd").toString().equals("435709")){
 						seller.put("shippolicy_no",mProduct.get("shippolicy_no").toString());
 					}else{
-						seller.put("shippolicy_no","");
+						seller.put("shippolicy_no","0");
 					}
 
 					Map<String, Object> address = selectAddresses(seller);
