@@ -190,26 +190,30 @@ public class ProdServiceImpl implements ProdService {
 					//멸치쇼핑은 무조건 묶음배송 없음.
 					request.put("bundledDeliveryAble",false);					//	Boolean	묶음배송가능여부	O		딜 등록시 사용한 배송템플릿 번호가 같더라도, 묶음배송가능여부가 false 이면, 딜별로 각각 배송비가 발생합니다
 
-					//배송비 방식 셋팅
-					String deliveryFeePolicy ="";
-					if(mProduct.get("shippingfeetype").toString().equals("01") || mProduct.get("quantitycntuseyn").toString().equals("Y")){
-						deliveryFeePolicy ="FREE";
-					}else if(mProduct.get("shippingfeetype").toString().equals("02")){
-						deliveryFeePolicy ="PER";
-					}else if(mProduct.get("shippingfeetype").toString().equals("03")){
-						deliveryFeePolicy ="AFTER";
-					}else if(mProduct.get("shippingfeetype").toString().equals("04") && mProduct.get("shippingfeepaytype").toString().equals("04")){
-						deliveryFeePolicy ="CONDITION";
-						request.put("deliveryFeeFreePrice",Integer.parseInt(mProduct.get("freeshippingamount").toString()));					//	Integer+	조건부 무료배송 기준 금액 (원)	V		배송비정책이 조건부무료배송(CONDITION)일때 필수
-					}
-					request.put("deliveryFeePolicy",deliveryFeePolicy);					//	DeliveryFeePolicy	배송비 정책 타입	O FREE : 무료배송, CONDITION : 조건부무료배송, PER : 선불, AFTER : 착불
-
 					//배송비 셋팅 수량별 배송일 경우 --수량별 배송비 무료배송 처리
 					if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
 						request.put("deliveryFee",0);							//	Integer+	배송비 금액 (원)	O
 					}else{
 						request.put("deliveryFee",Integer.parseInt(mProduct.get("shippingfee").toString()));							//	Integer+	배송비 금액 (원)	O
 					}
+					//배송비 방식 셋팅
+					String deliveryFeePolicy ="";
+					if(mProduct.get("shippingfeetype").toString().equals("01") || mProduct.get("quantitycntuseyn").toString().equals("Y")){
+						deliveryFeePolicy ="FREE";
+						request.put("deliveryFee",Integer.parseInt(mProduct.get("returnshippingfee").toString()));							//	Integer+	배송비 금액 (원)	O
+					}else if(mProduct.get("shippingfeetype").toString().equals("02")){
+						deliveryFeePolicy ="PER";
+					}else if(mProduct.get("shippingfeetype").toString().equals("03")){
+						deliveryFeePolicy ="AFTER";
+					}else if(mProduct.get("shippingfeetype").toString().equals("04") && mProduct.get("shippingfeepaytype").toString().equals("04")){
+						deliveryFeePolicy ="CONDITION";
+						request.put("deliveryFeeFreePrice",Integer.parseInt(mProduct.get("freeshippingamount").toString()));					//	Integer+	조건부 무료배송 기준 금액
+						// (원)	V		배송비정책이 조건부무료배송(CONDITION)일때 필수
+						request.put("deliveryFee",Integer.parseInt(mProduct.get("returnshippingfee").toString()));
+					}
+					request.put("deliveryFeePolicy",deliveryFeePolicy);					//	DeliveryFeePolicy	배송비 정책 타입	O FREE : 무료배송, CONDITION : 조건부무료배송, PER : 선불, AFTER : 착불
+
+
 
 
 					request.put("productType",mProduct.get("productType"));							//	ProductType	배송 상품타입	O		딜 등록시 productType과 반드시 일치
