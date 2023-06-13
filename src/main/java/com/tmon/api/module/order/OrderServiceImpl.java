@@ -236,7 +236,7 @@ public class OrderServiceImpl implements OrderService{
 						RestParameters params = new RestParameters();
 						Map<String, Object> oParam = new HashMap<>();
 						params.setBody(oParam);
-						tProduct = connector.call(HttpMethod.PUT, path, params);
+						tProduct = connector.call(HttpMethod.GET, path, params);
 
 						Map<String, Object> sqlMap = new HashMap<>();
 						//티몬 매핑 정보가 없을경우 매핑 정보를 생성해 준다.
