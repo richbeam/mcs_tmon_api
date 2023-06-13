@@ -157,11 +157,11 @@ public class ProdServiceImpl implements ProdService {
 			}
 		}catch (UserDefinedException a){
 			if(a.getMessage().contains("주소지명과 중복될 수 없습니다")){
-				path = "/deals/partners/addresses?addressName="+request.get("addressName").toString();
-				Map<String, Object> result = connector.call(HttpMethod.GET, path, params);
-				if(result!=null){
+				path = "/partners/addresses?addressName="+request.get("addressName").toString();
+				List<Map<String, Object>> response = connector.callList(HttpMethod.GET, path, params);
+				if(response.size() > 0){
 
-					//Map<String, Object> result = response.get(0);
+					Map<String, Object> result = response.get(0);
 					result.put("sellercd",seller.get("sellercd")); //판매자 코드
 					result.put("shippolicy_no",seller.get("shippolicy_no")); // 배송지 코드
 					address = ((Map<String, Object>)result.get("address"));
