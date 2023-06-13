@@ -47,7 +47,7 @@
         FROM tmon_address
         WHERE sellercd = #{sellercd}::numeric
         and   type     = #{type}
-		<if test="shippolicy_no != null and shippolicy_no != ''">
+		<if test="sellercd == '435709'">
 			AND shippolicy_no = #{shippolicy_no}::NUMERIC
 		</if>
     </select>

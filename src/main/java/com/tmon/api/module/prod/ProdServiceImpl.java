@@ -60,21 +60,28 @@ public class ProdServiceImpl implements ProdService {
 	public Map<String, Object> selectAddresses(Map<String, Object> seller) throws UserDefinedException {
 		Map<String, Object> rt = new HashMap<>();
 		rt.put("tStatus","SUCCESS");
+		//배송지 주소 셋팅
+		Map<String, Object> request = new HashMap<>();
+		String path = "/partners/addresses";
+		RestParameters params = new RestParameters();
+		Map<String, Object>  addr	= new HashMap<>();
+		Map<String, Object> address = new HashMap<>();
+		String tp = "";
 		try {
 			String[] types = {"D","R"}; //타입(D: 배송지, R: 반송지)
-			for(String tp : types){
+			for(String tps : types){
 
-				logger.warn("------------------tp : {}", tp);
-				String path = "/partners/addresses";
-				RestParameters params = new RestParameters();
+				logger.warn("------------------tp : {}", tps);
+				tp = tps;
 
 
-				Map<String, Object>  addr	= new HashMap<>();
-				Map<String, Object> address = new HashMap<>();
+
+
+
+
 
 				///////////////////////////////////////////////////////////////////////////////배송지
-				//배송지 주소 셋팅
-				Map<String, Object> request = new HashMap<>();
+
 				seller.put("type",tp);
 				request.put("type",tp);					//String	타입(D: 배송지, R: 반송지)	O
 				//마리오쇼핑일 경우
@@ -102,6 +109,11 @@ public class ProdServiceImpl implements ProdService {
 				request.put("defaultAddress", false);		//Boolean	기본배송지여부	X	false	기본 배송지 설정시 기존내용은 자동으로 설정취소됨
 
 				addr = basicSqlSessionTemplate.selectOne("ProdMapper.selectTmonAddress", seller);
+
+
+
+
+
 				if(addr == null){
 					//배송지 ,반품지 신규등록
 					path = "/partners/addresses";
@@ -142,6 +154,31 @@ public class ProdServiceImpl implements ProdService {
 				}else{
 					rt.put(tp,addr.get("no"));
 				}
+			}
+		}catch (UserDefinedException a){
+			if(a.getMessage().contains("주소지명과 중복될 수 없습니다")){
+				path = "/deals/partners/addresses?addressName="+request.get("addressName").toString();
+				List<Map<String, Object>> response = connector.callList(HttpMethod.GET, path, params);
+				if(response.size() > 0){
+
+					Map<String, Object> result = response.get(0);
+					result.put("sellercd",seller.get("sellercd")); //판매자 코드
+					result.put("shippolicy_no",seller.get("shippolicy_no")); // 배송지 코드
+					address = ((Map<String, Object>)result.get("address"));
+
+					result.put("zipCode",address.get("zipCode"));
+					result.put("address",address.get("address"));
+					result.put("addressDetail",address.get("addressDetail"));
+					result.put("streetAddress",address.get("streetAddress"));
+
+					basicSqlSessionTemplate.insert("ProdMapper.insertTmonAddress", result);
+					logger.warn("중복건 등록 ::: {}",result.toString());
+					rt.put(tp,result.get("no"));
+					return rt;
+				}
+				rt.put("tStatus","FAIL");
+				rt.put("tMessage",a.getMessage());
+				return rt;
 			}
 		}catch (Exception e){
 			e.printStackTrace();
