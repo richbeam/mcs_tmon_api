@@ -169,13 +169,24 @@ public class ProdServiceImpl implements ProdService {
 					//배송비 셋팅 수량별 배송비는 무료 배송으로 으로 셋팅
 
 					//템플릿명 셀러코드_배송방법_배송비방식_배송비_도서산간배송비_배송비결제방식_조건부배송금
-					String deliveryTemplateName = mProduct.get("sellercd")
-							+"_"+mProduct.get("shippingmethod").toString()
-							+"_"+mProduct.get("shippingfeetype").toString()
-							+"_"+mProduct.get("shippingfee").toString()
-							+"_"+mProduct.get("additionalshippingfee").toString()
-							+"_"+mProduct.get("shippingfeepaytype").toString()
-							+"_"+mProduct.get("freeshippingamount").toString();
+					String deliveryTemplateName = mProduct.get("sellercd").toString();
+							deliveryTemplateName +="_"+mProduct.get("shippingmethod").toString();
+							deliveryTemplateName +="_"+mProduct.get("shippingfeetype").toString();
+							if(mProduct.get("shippingfeetype").toString().equals("01")){
+								deliveryTemplateName +="_"+Integer.parseInt(mProduct.get("returnshippingfee").toString());
+							}else{
+								deliveryTemplateName +="_"+mProduct.get("shippingfee").toString();
+							}
+							deliveryTemplateName +="_"+mProduct.get("additionalshippingfee").toString();
+							deliveryTemplateName +="_"+mProduct.get("shippingfeepaytype").toString();
+							if(mProduct.get("shippingfeetype").toString().equals("04") && mProduct.get("shippingfeepaytype").toString().equals("04")){
+								deliveryTemplateName +="_"+mProduct.get("freeshippingamount").toString();
+								deliveryTemplateName +="_"+Integer.parseInt(mProduct.get("returnshippingfee").toString());
+							}else{
+								deliveryTemplateName +="_"+mProduct.get("freeshippingamount").toString();
+
+							}
+
 					//--수량별 배송비 무료배송 처리
 					if(mProduct.get("quantitycntuseyn").toString().equals("Y")){
 						deliveryTemplateName += "_"+mProduct.get("quantitycntuseyn").toString();
