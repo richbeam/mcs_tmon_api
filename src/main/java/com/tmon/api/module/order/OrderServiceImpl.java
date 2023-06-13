@@ -832,14 +832,25 @@ public class OrderServiceImpl implements OrderService{
 			//티몬딜옵션정보들
 			paramMap.put("tmonDealOptions",tmonDealOptions);
 
-			//택배일경우
-			if(order.get("shippingmethod").toString().equals("01")){
-				invoice.put("deliveryCorp", Long.parseLong(deliveryCompany.get("deliverycorpcd").toString()));
-				invoice.put("invoiceNo",order.get("shippingno").toString());
-				tranDetail.put("invoiceNo",order.get("shippingno").toString());
-				//invoice.put("additionalInvoices",""); //  "additionalInvoices" : ["12536354323"]
-			}else{
-			//직배송일경우
+			try{
+				//택배일경우
+				if(order.get("shippingmethod").toString().equals("01")){
+					invoice.put("deliveryCorp", Long.parseLong(deliveryCompany.get("deliverycorpcd").toString()));
+					invoice.put("invoiceNo",order.get("shippingno").toString());
+					tranDetail.put("invoiceNo",order.get("shippingno").toString());
+					//invoice.put("additionalInvoices",""); //  "additionalInvoices" : ["12536354323"]
+				}else{
+					//직배송일경우
+					invoice.put("deliveryCorp",10099);
+					order.put("shippingno",10099);
+					tranDetail.put("invoiceNo","10099");
+					//발송예정일 포맷 yyyy-MM-dd자체배송은 송장등록시 송장번호가 아닌 발송예정일을 입력합니다.
+					String today = StringUtil.getTodayString("yyyy-MM-dd");
+					paramMap.put("deliveryScheduledDate",today);
+				}
+			}catch (Exception e){
+				logger.error("------택배사 오류로 인한 직배송 처리 :::::::::::::{}, {}",order.get("m_ordercd").toString(),order.get("ordercd").toString());
+				//직배송일경우
 				invoice.put("deliveryCorp",10099);
 				order.put("shippingno",10099);
 				tranDetail.put("invoiceNo","10099");
@@ -847,6 +858,7 @@ public class OrderServiceImpl implements OrderService{
 				String today = StringUtil.getTodayString("yyyy-MM-dd");
 				paramMap.put("deliveryScheduledDate",today);
 			}
+
 			paramMap.put("invoice",invoice);
 			params.setBody(paramMap);
 
