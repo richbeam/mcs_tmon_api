@@ -57,9 +57,9 @@ spring:
          validation-query: select 1
          test-on-borrow: true         
          hikari:            
-            maximumPoolSize: 40
-            maxLifeTime: 180000
-            connectionTimeout: 20000
+            maximumPoolSize: 45
+            maxLifeTime: 80000
+            connectionTimeout: 90000
          
 --- #dev
 spring: 
@@ -75,9 +75,9 @@ spring:
          validation-query: select 1
          test-on-borrow: true
          hikari:
-             maximumPoolSize: 40
-             maxLifeTime: 180000
-             connectionTimeout: 50000
+             maximumPoolSize: 45
+             maxLifeTime: 80000
+             connectionTimeout: 90000
             
 --- #real 
 spring: 
@@ -92,9 +92,9 @@ spring:
          validation-query: select 1
          test-on-borrow: true
          hikari:
-             maximumPoolSize: 40
-             maxLifeTime: 180000
-             connectionTimeout: 50000
+             maximumPoolSize: 45
+             maxLifeTime: 80000
+             connectionTimeout: 90000
 ---
 kafka:
   servers: log0:9092,log1:9092,log2:9092 
