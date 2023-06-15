@@ -117,7 +117,7 @@ public class TmonConnector {
 		String statusCode = null;
 		try {
 			responseEntity = restTemplate.exchange(requestEntity, String.class);
-			logger.warn("responseEntity 값 " + responseEntity);
+			//logger.warn("responseEntity 값 " + responseEntity);
 		} catch (HttpStatusCodeException e) {
 			e.printStackTrace();
 			// 통신 오류(서버에서 500에러 반환)

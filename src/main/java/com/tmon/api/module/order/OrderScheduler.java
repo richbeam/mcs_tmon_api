@@ -83,7 +83,7 @@ public class OrderScheduler {
 				}
 			}
 		} else {
-			logger.warn(">>> getOrderList 없음: {}", orders);
+			logger.warn(">>> getOrderList 없음: ");
 		}
 		logger.warn(">>>>>>>>>>> getOrderList 결제완료 종료");
 	}
@@ -195,12 +195,12 @@ public class OrderScheduler {
 
 
 				} catch (Exception e) {
-					logger.warn("shipOrders ::: {}", e.getMessage());
+					logger.error("shipOrders ::: {}", e.getMessage());
 					e.printStackTrace();
 				}
 			}
 		} else {
-			logger.warn(">>> 주문확인 내역없음: {}", orders);
+			logger.error(">>> 주문확인 내역없음: {}");
 		}
 		logger.warn(">>>>>>>>>>> 송장등록 처리 종료");
 	}
@@ -223,7 +223,7 @@ public class OrderScheduler {
 
 		String startDate = StringUtil.orderTimeAdd(today, -2600);
 		String endDate = StringUtil.orderTimeAdd(today, -40);
-		logger.warn("-----startDate : endDate = {} : {}",startDate,endDate);
+		//logger.warn("-----startDate : endDate = {} : {}",startDate,endDate);
 
 		params.setRequestParameters(paramMap);
 		params.setPathVariableParameters(paramMap);

@@ -453,7 +453,7 @@ public class OrderServiceImpl implements OrderService{
 					commOrderMap.put("sellercd", sellercd);
 					//comm_order 등록
 					basicSqlSessionTemplate.insert("OrderMapper.insertCommOrders", commOrderMap);
-					logger.warn("-----commOrderRow INSERT : {}",commOrderMap.toString() );
+					//logger.warn("-----commOrderRow INSERT : {}",commOrderMap.toString() );
 
 					//로그 입력
 					logMap.put("m_ordercd", mOrderCd);
@@ -533,7 +533,7 @@ public class OrderServiceImpl implements OrderService{
 
 					if(isChanged) {
 						basicSqlSessionTemplate.insert("OrderMapper.updateCommOrders", commOrderMap); //comm_order 수정(배송지)
-						logger.warn("-----commOrderRow UPDATE : {}",commOrderMap.toString() );
+						//logger.warn("-----commOrderRow UPDATE : {}",commOrderMap.toString() );
 					}
 				}
 				//2.comm_order_details 저장
@@ -559,7 +559,7 @@ public class OrderServiceImpl implements OrderService{
 						Map<String, Object> orderMappingRow = basicSqlSessionTemplate.selectOne("OrderMapper.selectTmonMappingInfoNew", orderMappingMap);
 						if (orderMappingRow == null) {
 							basicSqlSessionTemplate.insert("OrderMapper.insertTmonMappingInfo", orderMappingMap);
-							logger.warn("-----commOrderDetail INSERT : {}",commOrderDetail.toString() );
+							//logger.warn("-----commOrderDetail INSERT : {}",commOrderDetail.toString() );
 						}
 					}
 
@@ -588,7 +588,7 @@ public class OrderServiceImpl implements OrderService{
 
 
 		}catch (Exception e){
-			logger.warn(":::::::::::::::::::::::::::::::; {}  등록 실패.",order.get("tmonOrderNo"));
+			logger.error(":::::::::::::::::::::::::::::::; {}  등록 실패.",order.get("tmonOrderNo"));
 			e.printStackTrace();
 		}
 

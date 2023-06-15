@@ -71,7 +71,7 @@ public class ProdServiceImpl implements ProdService {
 			String[] types = {"D","R"}; //타입(D: 배송지, R: 반송지)
 			for(String tps : types){
 
-				logger.warn("------------------tp : {}", tps);
+				//logger.warn("------------------tp : {}", tps);
 				tp = tps;
 
 
@@ -716,7 +716,7 @@ public class ProdServiceImpl implements ProdService {
 				}
 
 			}else{
-				logger.warn("--------- 단일 옵션");
+				//logger.warn("--------- 단일 옵션");
 				DealOption = new HashMap<>();
 				//옵션이 없는 단일 상품일 경우
 				DealOption.put("vendorDealOptionNo",productcd);		//	String(1..50)	연동업체 상품키	O		unique
@@ -736,7 +736,7 @@ public class ProdServiceImpl implements ProdService {
 
 
 
-            logger.warn("--------옵션 정보 : {}",dealOptions.toString());
+            //logger.warn("--------옵션 정보 : {}",dealOptions.toString());
 
 			product.put("dealOptions",dealOptions);               		// List<DealOption>(1..200)    옵션들 O       옵션은 200개까지만 가능
 
@@ -1201,7 +1201,7 @@ public class ProdServiceImpl implements ProdService {
 					path = "/deals/"+ newProduct.get("productcd").toString()+"/resume";
 					response = connector.call(HttpMethod.PUT, path, params);
 					basicSqlSessionTemplate.update("ProdMapper.updateTmonProductsResume", sqlMap);
-					logger.warn("------판매 재개 완료 : ");
+					//logger.warn("------판매 재개 완료 : ");
 				}
 
 				//상품매핑
@@ -1216,7 +1216,7 @@ public class ProdServiceImpl implements ProdService {
 				if(product.get("tStatus").equals("FAIL")){
 					logger.error("::::::update 상품 매핑시 오류 발생 ::"+product.toString());
 				}else{
-					logger.error("::::::update 상품  ::"+product.toString());
+					//logger.warn("::::::update 상품  ::"+product.toString());
 					response = connector.call(HttpMethod.PUT, path, params);
 					logger.warn("::::::::::::::::::::::update response = "+response.toString());
 					Map<String, Object> deal = (Map<String, Object>)response.get("deal");
