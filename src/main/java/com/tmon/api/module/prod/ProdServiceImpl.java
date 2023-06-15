@@ -1402,7 +1402,7 @@ public class ProdServiceImpl implements ProdService {
 	 * @param qna
 	 */
 	@Override
-	@Transactional(value="basicTxManager")
+	//@Transactional(value="basicTxManager")
 	public void insertQna(Map<String, Object> qna) {
 		Map<String, Object> sqlMap = new HashMap<String, Object>();
 		//글번호
@@ -1455,7 +1455,7 @@ public class ProdServiceImpl implements ProdService {
 	 * @throws UserDefinedException
 	 */
 	@Override
-	@Transactional(value="basicTxManager")
+	//@Transactional(value="basicTxManager")
 	public void updateQnaAnswer(Map<String, Object> qnaAnswer) throws UserDefinedException  {
 		/* QNA 답변등록 API호출 */
 		RestParameters params = new RestParameters();
@@ -1489,7 +1489,7 @@ public class ProdServiceImpl implements ProdService {
 	 * @param qna
 	 */
 	@Override
-	@Transactional(value="basicTxManager")
+	//@Transactional(value="basicTxManager")
 	public void insertCsQna(Map<String, Object> qna) {
 		Map<String, Object> sqlMap = new HashMap<String, Object>();
 		try{
@@ -1572,7 +1572,7 @@ public class ProdServiceImpl implements ProdService {
 	 * @throws UserDefinedException
 	 */
 	@Override
-	@Transactional(value="basicTxManager")
+	//@Transactional(value="basicTxManager")
 	public void updateCsQnaAnswer(Map<String, Object> qnaAnswer) throws UserDefinedException  {
 		/* CS 문의 등록 API호출 */
 		RestParameters params = new RestParameters();

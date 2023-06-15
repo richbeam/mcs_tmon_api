@@ -56,10 +56,10 @@ spring:
          password: 1234                             
          validation-query: select 1
          test-on-borrow: true         
-         hikari:            
-            maximumPoolSize: 45
-            maxLifeTime: 80000
-            connectionTimeout: 90000
+         hikari:
+          maximumPoolSize: 55
+          maxLifeTime: 30000
+          connectionTimeout: 20000
          
 --- #dev
 spring: 
@@ -75,9 +75,9 @@ spring:
          validation-query: select 1
          test-on-borrow: true
          hikari:
-             maximumPoolSize: 45
-             maxLifeTime: 80000
-             connectionTimeout: 90000
+          maximumPoolSize: 55
+          maxLifeTime: 30000
+          connectionTimeout: 20000
             
 --- #real 
 spring: 
@@ -92,9 +92,9 @@ spring:
          validation-query: select 1
          test-on-borrow: true
          hikari:
-             maximumPoolSize: 45
-             maxLifeTime: 80000
-             connectionTimeout: 90000
+          maximumPoolSize: 55
+          maxLifeTime: 30000
+          connectionTimeout: 20000
 ---
 kafka:
   servers: log0:9092,log1:9092,log2:9092 
