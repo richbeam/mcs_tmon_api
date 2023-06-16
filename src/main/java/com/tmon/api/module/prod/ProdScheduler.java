@@ -64,7 +64,7 @@ public class ProdScheduler {
 	 * @throws Exception
 	 */
 	//@Scheduled(cron="0 0/4 * * * ?")
-    @Scheduled(initialDelay = 1900, fixedDelay = 128000)
+    @Scheduled(initialDelay = 1900, fixedDelay = 148000)
 	public void insertProducts() throws Exception {
 		logger.warn(">>>>>>>>>>> selectNewProducts start");
 		//등록 대상건 조회
@@ -81,7 +81,7 @@ public class ProdScheduler {
 	 * @throws Exception
 	 */
 	//@Scheduled(cron="40 0/1 * * * ?")
-	@Scheduled(initialDelay = 19900, fixedDelay = 125000)
+	@Scheduled(initialDelay = 19900, fixedDelay = 145000)
 	public Response updateProducts() throws Exception {
 		logger.warn(">>>>>>>>>>> selectUpdatedProducts start");
 		//수정 대상건 조회
@@ -113,7 +113,7 @@ public class ProdScheduler {
      * @throws Exception
      */
     //@Scheduled(cron="40 0/1 * * * ?")
-    @Scheduled(initialDelay = 19900, fixedDelay = 45000)
+    @Scheduled(initialDelay = 19900, fixedDelay = 65000)
     public Response setStopProducts() throws Exception {
         logger.warn(">>>>>>>>>>> setStopProducts start");
         //수정 대상건 조회
@@ -204,7 +204,7 @@ public class ProdScheduler {
 	 * @throws Exception
 	 */
 	//@Scheduled(cron="0 0/4 * * * ?")
-	@Scheduled(initialDelay = 96500, fixedDelay = 190000)
+	@Scheduled(initialDelay = 96500, fixedDelay = 290000)
 	public void insertQnaAnswer () throws Exception {
 		logger.warn(">>>>>>>>>>> 상품QnA답변 등록 시작");
 		//셀러 상품 삭제건 대상조회

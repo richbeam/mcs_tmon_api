@@ -40,8 +40,8 @@ spring:
     rest-template:
       max-conn-total: 50
       max-per-route: 20
-      connect-timeout: 12000
-      read-timeout: 30000
+      connect-timeout: 30000
+      read-timeout: 90000
  
 
 --- #local
@@ -57,7 +57,7 @@ spring:
          validation-query: select 1
          test-on-borrow: true         
          hikari:
-           maximumPoolSize: 55
+           maximumPoolSize: 70
            maxLifeTime: 130000
            connectionTimeout: 30000
          
@@ -75,7 +75,7 @@ spring:
          validation-query: select 1
          test-on-borrow: true
          hikari:
-           maximumPoolSize: 55
+           maximumPoolSize: 70
            maxLifeTime: 130000
            connectionTimeout: 30000
             
@@ -92,7 +92,7 @@ spring:
          validation-query: select 1
          test-on-borrow: true
          hikari:
-           maximumPoolSize: 55
+           maximumPoolSize: 70
            maxLifeTime: 130000
            connectionTimeout: 30000
 ---

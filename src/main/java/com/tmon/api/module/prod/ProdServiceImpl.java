@@ -56,7 +56,7 @@ public class ProdServiceImpl implements ProdService {
 	 * @return
 	 * @throws UserDefinedException
 	 */
-	@Transactional(value="basicTxManager")
+	//@Transactional(value="basicTxManager")
 	public Map<String, Object> selectAddresses(Map<String, Object> seller) throws UserDefinedException {
 		Map<String, Object> rt = new HashMap<>();
 		rt.put("tStatus","SUCCESS");
@@ -191,7 +191,7 @@ public class ProdServiceImpl implements ProdService {
 	}
 
 	//배송템플릿 등록
-	@Transactional(value="basicTxManager")
+	//@Transactional(value="basicTxManager")
 	public Map<String, Object> selectDeliTemplate(Map<String, Object> mProduct,Map<String, Object> seller) throws UserDefinedException {
 		Map<String, Object> rt = new HashMap<>();
 		rt.put("tStatus","SUCCESS");
