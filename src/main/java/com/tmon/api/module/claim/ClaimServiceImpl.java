@@ -78,7 +78,7 @@ static final Logger logger = LoggerFactory.getLogger(ClaimServiceImpl.class);
 	 * @param order
 	 */
 	@Override
-	//@Transactional(value="basicTxManager")
+	@Transactional(value="basicTxManager")
 	public void cancelRequests(Map<String, Object> order) {
 
 		Map<String, Object> tranDetail = new HashMap<String, Object>();
@@ -648,7 +648,7 @@ static final Logger logger = LoggerFactory.getLogger(ClaimServiceImpl.class);
 	 * @param order
 	 */
 	@Override
-	//@Transactional(value="basicTxManager")
+	@Transactional(value="basicTxManager")
 	public void returnRequests(Map<String, Object> order) {
 
 		Map<String, Object> tranDetail = new HashMap<String, Object>();
@@ -1044,7 +1044,7 @@ static final Logger logger = LoggerFactory.getLogger(ClaimServiceImpl.class);
 	 * @param order
 	 */
 	@Override
-	//@Transactional(value="basicTxManager")
+	@Transactional(value="basicTxManager")
 	public void exchangesRequests(Map<String, Object> order) {
 
 		Map<String, Object> tranDetail = new HashMap<String, Object>();

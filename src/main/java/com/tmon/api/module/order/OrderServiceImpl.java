@@ -956,7 +956,7 @@ public class OrderServiceImpl implements OrderService{
 	 * @throws UserDefinedException
 	 */
 	@Override
-	//@Transactional(value="basicTxManager")
+	@Transactional(value="basicTxManager")
 	public void syncOrderStatus(Map<String, Object> order) throws Exception {
 		try{
 
