@@ -114,7 +114,7 @@ public class OrderServiceImpl implements OrderService{
 			for(Map<String, Object> deals_ : (List<Map<String, Object>>)order.get("deals")) {
 				//티몬 배송비 정보
 				Map<String, Object> deliveryFee_ = (Map<String, Object>) deals_.get("deliveryFee");
-				shipamount += deals_.get("deliveryFee") != null ? Integer.parseInt(deliveryFee_.get("amount").toString().trim()) + Integer.parseInt(deliveryFee_.get("longDistanceAmount").toString().trim()) : 0;
+				shipamount += deals_.get("deliveryFee") != null ? Integer.parseInt(deliveryFee_.get("userAmount").toString().trim()) + Integer.parseInt(deliveryFee_.get("longDistanceAmount").toString().trim()) : 0;
 				outpostshipamount += deals_.get("longDistanceAmount") != null ? Integer.parseInt(deliveryFee_.get("longDistanceAmount").toString().trim()) : 0;
 				List<Map<String, Object>> dealOptions_ = (List<Map<String, Object>>) deals_.get("dealOptions");
 				for(Map<String, Object> opt_ : dealOptions_){
@@ -337,7 +337,7 @@ public class OrderServiceImpl implements OrderService{
 						sellingprice  = sellingprice - Integer.parseInt(mProduct.get("shippingfee").toString());
 					}else {
 						//배송비 셋팅
-						shipamount = deals.get("deliveryFee") != null ? Integer.parseInt(deliveryFee.get("amount").toString().trim()) + Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim()) : 0;
+						shipamount = deals.get("deliveryFee") != null ? Integer.parseInt(deliveryFee.get("userAmount").toString().trim()) + Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim()) : 0;
 						outpostshipamount = deals.get("longDistanceAmount") != null ? Integer.parseInt(deliveryFee.get("longDistanceAmount").toString().trim()) : 0;
 					}
 					//배송비
