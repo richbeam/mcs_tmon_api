@@ -81,7 +81,7 @@ public class ProdScheduler {
 	 * @throws Exception
 	 */
 	//@Scheduled(cron="40 0/1 * * * ?")
-	@Scheduled(initialDelay = 19900, fixedDelay = 145000)
+	@Scheduled(initialDelay = 19900, fixedDelay = 125000)
 	public Response updateProducts() throws Exception {
 		logger.warn(">>>>>>>>>>> selectUpdatedProducts start");
 		//수정 대상건 조회
