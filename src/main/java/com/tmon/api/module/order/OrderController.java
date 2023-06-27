@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -202,5 +203,67 @@ public class OrderController {
 
 
 		return response;
+	}
+
+	//티몬 정산 가져오기
+	/* REST 주문확인 처리 단건  */
+	@ApiOperation(value = "[TMON] 정산 조회처리 Manual", notes = "[TMON] Manual 정산데이터를 조회 한다.", authorizations = {@Authorization(value="basicAuth")})
+	@RequestMapping(value="/getSettlementManual", method = {RequestMethod.GET})
+	public void getSettlementM(
+			@ApiParam(value = "조회시작일", name = "searchDate", defaultValue = "2023-05-18", required = true) @RequestParam String searchDate
+	) throws Exception {
+		logger.warn(">>>>>>>>>>> getSettlement 정산 데이터  시작");
+		//대상조회 - 접수된 주문 조회
+		RestParameters params = new RestParameters();
+		Map<String, Object> paramMap = new HashMap<>();
+		Map<String, Object> result = null;
+		//판매 일지 정지
+		String path = "/settlement";
+		//String searchDate = StringUtil.getTodayString("yyyy-MM-dd");
+		paramMap.put("searchDate", searchDate);  // 	조회 일자 (yyyy-MM-dd)	O		조회 가능 범위 : 1일
+		params.setRequestParameters(paramMap);
+		params.setPathVariableParameters(paramMap);
+		//paramMap.put("searchDate", searchDate);  // 	조회 일자 (yyyy-MM-dd)	O		조회 가능 범위 : 1일
+
+		params.setBody(paramMap);
+
+		result = connector.call(HttpMethod.GET, path, params);
+		//주문등록
+		if(result != null ){
+			if(result.get("Settlement") != null) {
+				List<Map<String, Object>> Settlements =(List<Map<String, Object>>) result.get("Settlement");
+				logger.warn(">>> getSettlement : settles {}", Settlements.size());
+				for(Map<String, Object> settlement : Settlements) {
+					try {
+						logger.warn("settlement ::::: {}",settlement.toString());
+						//orderService.syncOrderStatus(order);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						//logger.warn(">>> requestOrders error {}", e.getMessage());
+					}
+				}
+				logger.warn("-------------------------------------------------------------------------------");
+				List<Map<String, Object>> extraDatas =(List<Map<String, Object>>) result.get("ExtraData");
+				for(Map<String, Object> extraData : extraDatas) {
+					try {
+						logger.warn("extraData :: {}",extraData.toString());
+						//orderService.syncOrderStatus(order);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						//logger.warn(">>> requestOrders error {}", e.getMessage());
+					}
+				}
+
+			} else {
+				logger.warn(">>> getSettlement 없음: getSettlement {} " );
+			}
+
+		}
+
+
+
+		logger.warn(">>>>>>>>>>> getSettlement 정산 데이터  시작");
 	}
 }
