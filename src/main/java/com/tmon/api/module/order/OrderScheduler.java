@@ -281,14 +281,13 @@ public class OrderScheduler {
 		Map<String, Object> result = null;
 		//판매 일지 정지
 		String path = "/settlement";
-
 		String searchDate = StringUtil.getTodayString("yyyy-MM-dd");
-
+		paramMap.put("searchDate", "2023-05-01");  // 	조회 일자 (yyyy-MM-dd)	O		조회 가능 범위 : 1일
 		params.setRequestParameters(paramMap);
 		params.setPathVariableParameters(paramMap);
 		//paramMap.put("searchDate", searchDate);  // 	조회 일자 (yyyy-MM-dd)	O		조회 가능 범위 : 1일
-		paramMap.put("searchDate", "2023-05-01");  // 	조회 일자 (yyyy-MM-dd)	O		조회 가능 범위 : 1일
 
+		params.setBody(paramMap);
 
 		result = connector.call(HttpMethod.GET, path, params);
 		//주문등록
