@@ -1217,146 +1217,150 @@ static final Logger logger = LoggerFactory.getLogger(ClaimServiceImpl.class);
 		selMap = new HashMap<String, Object>();
 		selMap.put("sitename", "TMON"); //사이트명
 		selMap.put("ordercd" , order.get("tmonOrderNo").toString()); //원주문번호
+		try{
+			if(order.containsKey("claimDeals") && null != order.get("claimDeals")){
+				List<Map<String, Object>> claimDeals = (List<Map<String, Object>>)order.get("claimDeals");
+				for(Map<String, Object> claim : claimDeals){
+					selMap.put("detail_no" , claim.get("tmonDealNo")); //티몬 딜 번호환
 
-		if(order.containsKey("claimDeals") && null != order.get("claimDeals")){
-			List<Map<String, Object>> claimDeals = (List<Map<String, Object>>)order.get("claimDeals");
-			for(Map<String, Object> claim : claimDeals){
-				selMap.put("detail_no" , claim.get("tmonDealNo")); //티몬 딜 번호환
+					Map<String, Object> mapingInfo = basicSqlSessionTemplate.selectOne("ClaimMapper.selectTmonMappingInfo", selMap);
 
-				Map<String, Object> mapingInfo = basicSqlSessionTemplate.selectOne("ClaimMapper.selectTmonMappingInfo", selMap);
+					Map<String, Object> detailRow = basicSqlSessionTemplate.selectOne("ClaimMapper.selectCommOrderDetail", selMap);
 
-				Map<String, Object> detailRow = basicSqlSessionTemplate.selectOne("ClaimMapper.selectCommOrderDetail", selMap);
-
-				if(null == detailRow || null == mapingInfo) {
-					logger.error(">>> 멸치DB 주문조회 실패 redeliveriesRequests : {}", order);
-					return;
-				}
-
-				//로그입력용세팅
-				logMap.put("sitename" , detailRow.get("sitename"));
-				logMap.put("ordercd"  , detailRow.get("ordercd"));
-				logMap.put("productcd", detailRow.get("productcd"));
-
-				if (OrderStauts.STAUTS_10.equals(detailRow.get("status")) || OrderStauts.STAUTS_11.equals(detailRow.get("status")) || OrderStauts.STAUTS_12.equals(detailRow.get("status"))) {
-					logger.warn("재배송 완료된 주문 skip ==" + selMap.get("ordercd"));
-					return;
-				}
-
-				String orderStatus = OrderStauts.STAUTS_10;
-				String claimStatus = claim.get("claimStatus").toString();
-				switch (claimStatus) {
-					case "C1" :
-						//"description":"요청"
-						orderStatus = OrderStauts.STAUTS_08;
-						break;
-					case "C2" :
-						//"description":"승인"
-						orderStatus = OrderStauts.STAUTS_11;
-						break;
-					case "C3" :
-						//"description":"완료"
-						orderStatus = OrderStauts.STAUTS_12;
-						break;
-					case "C4" :
-						//"description":"미입금취소"
-						orderStatus = OrderStauts.STAUTS_05;
-						break;
-					case "C8" :
-						//"description":"철회"
-						orderStatus = OrderStauts.STAUTS_05;
+					if(null == detailRow || null == mapingInfo) {
+						logger.error(">>> 멸치DB 주문조회 실패 redeliveriesRequests : {}", order);
 						return;
-					//break;
-					case "C9" :
-						//"description":"거절"
-						orderStatus = OrderStauts.STAUTS_05;
-						break;
-				}
+					}
+
+					//로그입력용세팅
+					logMap.put("sitename" , detailRow.get("sitename"));
+					logMap.put("ordercd"  , detailRow.get("ordercd"));
+					logMap.put("productcd", detailRow.get("productcd"));
+
+					if (OrderStauts.STAUTS_10.equals(detailRow.get("status")) || OrderStauts.STAUTS_11.equals(detailRow.get("status")) || OrderStauts.STAUTS_12.equals(detailRow.get("status"))) {
+						logger.warn("재배송 완료된 주문 skip ==" + selMap.get("ordercd"));
+						return;
+					}
+
+					String orderStatus = OrderStauts.STAUTS_10;
+					String claimStatus = claim.get("claimStatus").toString();
+					switch (claimStatus) {
+						case "C1" :
+							//"description":"요청"
+							orderStatus = OrderStauts.STAUTS_08;
+							break;
+						case "C2" :
+							//"description":"승인"
+							orderStatus = OrderStauts.STAUTS_11;
+							break;
+						case "C3" :
+							//"description":"완료"
+							orderStatus = OrderStauts.STAUTS_12;
+							break;
+						case "C4" :
+							//"description":"미입금취소"
+							orderStatus = OrderStauts.STAUTS_05;
+							break;
+						case "C8" :
+							//"description":"철회"
+							orderStatus = OrderStauts.STAUTS_05;
+							return;
+						//break;
+						case "C9" :
+							//"description":"거절"
+							orderStatus = OrderStauts.STAUTS_05;
+							break;
+					}
 
 
-				String clmRsnCd = "";
-				String clmRsnNm = "";
+					String clmRsnCd = "";
+					String clmRsnNm = "";
 		/*
 			{"C1":"요청"	},{"C2""승인"},{"C3":"완료"},{"C4""미입금취소"},{"C8":"철회"},{"C9""거절"}
 		 */
-				if (claim.get("requestReason") != null) {
-					clmRsnCd = claim.get("requestReason").toString();
-					switch (clmRsnCd) {
-						case "RDD1" :
-							clmRsnNm = "주문상품 중 일부가 배송되지 않음";
-							break;
-						case "RDD2" :
-							clmRsnNm = "배송 도중 상품이 분실됨 (배송분실)";
-							break;
-						case "RDD3" :
-							clmRsnNm = "기타";
-							break;
-						case "RDD4" :
-							clmRsnNm = "품절 미배송";
-							break;
-						case "RCD5" :
-							clmRsnNm = "포장과 상품이 파손됨 (배송파손)";
-							break;
+					if (claim.get("requestReason") != null) {
+						clmRsnCd = claim.get("requestReason").toString();
+						switch (clmRsnCd) {
+							case "RDD1" :
+								clmRsnNm = "주문상품 중 일부가 배송되지 않음";
+								break;
+							case "RDD2" :
+								clmRsnNm = "배송 도중 상품이 분실됨 (배송분실)";
+								break;
+							case "RDD3" :
+								clmRsnNm = "기타";
+								break;
+							case "RDD4" :
+								clmRsnNm = "품절 미배송";
+								break;
+							case "RCD5" :
+								clmRsnNm = "포장과 상품이 파손됨 (배송파손)";
+								break;
 
+						}
 					}
+
+					//요청사유상세 정보가 있을경우
+					if(claim.containsKey("requestReasonDetail")){
+						clmRsnNm = clmRsnNm + ":" + claim.get("requestReasonDetail").toString();
+					}
+
+					logMap.put("status"  , orderStatus);
+					logMap.put("api_url" , "/acancellations");
+
+					tranDetail.put("sitename"    , detailRow.get("sitename")); //사이트명
+					tranDetail.put("m_ordercd"   , detailRow.get("m_ordercd"));  //멸치 주문번호
+					tranDetail.put("ordercd"     , detailRow.get("ordercd"));  //주문번호
+					tranDetail.put("detail_no"   , detailRow.get("detail_no"));  //주문상세번호
+					tranDetail.put("status"      , orderStatus);     //취소상태
+					tranDetail.put("apiindexing" , "N");                       //멸치쇼핑 이관여부
+					tranDetail.put("cancelReason", clmRsnNm); 	//상세사유
+
+					//클레임 내용 작성
+					tranDetail.put("claimno", order.get("claimNo").toString()); 	//클레임번호
+					tranDetail.put("claimtype", order.get("claimType")); 	//클레임타입
+					tranDetail.put("claimstatus", order.get("claimStatus")); 	//클레임상태
+					tranDetail.put("claimdealoptions", claim.get("claimDealOptions").toString()); 	//클레임 딜 옵션 정보
+					tranDetail.put("requestreason", clmRsnNm); 	//상세사유
+
+					//logger.warn(">>cancelRequests tranDetail : {}", tranDetail);
+					basicSqlSessionTemplate.update("ClaimMapper.updateCommOrderDetail", tranDetail); //comm_order_detail 수정
+
+					//매핑 테이블 업데이트
+					basicSqlSessionTemplate.update("ClaimMapper.updateTmonMappingInfo", tranDetail);
+					//클레임 history
+					basicSqlSessionTemplate.selectOne("ClaimMapper.insertTmonMappingHistory", tranDetail);
+
+					//변경테이블
+					Map<String, Object> changeMap = new HashMap<String, Object>();
+					changeMap.put("sitename"   , detailRow.get("sitename"));               //사이트명
+					changeMap.put("m_ordercd"  , detailRow.get("m_ordercd"));
+					changeMap.put("ordercd"    , detailRow.get("ordercd"));
+					changeMap.put("productcd"  , detailRow.get("productcd"));
+					changeMap.put("statuscd"   , orderStatus);
+					changeMap.put("apistatuscd", 9); //6:취소요청,41 부분교환요청,42 부분반품요청,43 부분취소요청
+					//changeMap.put("reason"     , "재배송 요청 (회수 불가) : " + clmRsnNm + " / " + order.get("claimNo") + " / " + detailRow.get("m_ordercd") + " / " + detailRow.get("ordercd") + " / " + detailRow.get("productcd")); //취소요청 사유
+					changeMap.put("reason"     , "재배송 요청 (회수 불가) : " + clmRsnNm + " / claimNo : " + order.get("claimNo")); //취소요청 사유
+
+					Map<String, Object> changeRow = basicSqlSessionTemplate.selectOne("ClaimMapper.selectCommOrderChange", changeMap);
+					//logger.warn(">>cancelRequests changeMap : {}", changeMap);
+					if(null == changeRow) {
+						basicSqlSessionTemplate.insert("ClaimMapper.insertCommOrderChange", changeMap);
+						logUtil.insertOrderScheduleSuccessLog(logMap);
+					} else {
+						changeMap.put("seq", changeRow.get("seq"));
+						changeMap.put("apiindexing"   , "U");
+						basicSqlSessionTemplate.update("ClaimMapper.updateCommOrderChange", changeMap);
+						logUtil.insertOrderScheduleSuccessLog(logMap);
+					}
+
+					logger.warn("================== 재배송 생성 : {} , {}", detailRow.get("m_ordercd"), order.get("claimNo"));
 				}
-
-				//요청사유상세 정보가 있을경우
-				if(claim.containsKey("requestReasonDetail")){
-					clmRsnNm = clmRsnNm + ":" + claim.get("requestReasonDetail").toString();
-				}
-
-				logMap.put("status"  , orderStatus);
-				logMap.put("api_url" , "/acancellations");
-
-				tranDetail.put("sitename"    , detailRow.get("sitename")); //사이트명
-				tranDetail.put("m_ordercd"   , detailRow.get("m_ordercd"));  //멸치 주문번호
-				tranDetail.put("ordercd"     , detailRow.get("ordercd"));  //주문번호
-				tranDetail.put("detail_no"   , detailRow.get("detail_no"));  //주문상세번호
-				tranDetail.put("status"      , orderStatus);     //취소상태
-				tranDetail.put("apiindexing" , "N");                       //멸치쇼핑 이관여부
-				tranDetail.put("cancelReason", clmRsnNm); 	//상세사유
-
-				//클레임 내용 작성
-				tranDetail.put("claimno", order.get("claimNo").toString()); 	//클레임번호
-				tranDetail.put("claimtype", order.get("claimType")); 	//클레임타입
-				tranDetail.put("claimstatus", order.get("claimStatus")); 	//클레임상태
-				tranDetail.put("claimdealoptions", claim.get("claimDealOptions").toString()); 	//클레임 딜 옵션 정보
-				tranDetail.put("requestreason", clmRsnNm); 	//상세사유
-
-				//logger.warn(">>cancelRequests tranDetail : {}", tranDetail);
-				basicSqlSessionTemplate.update("ClaimMapper.updateCommOrderDetail", tranDetail); //comm_order_detail 수정
-
-				//매핑 테이블 업데이트
-				basicSqlSessionTemplate.update("ClaimMapper.updateTmonMappingInfo", tranDetail);
-				//클레임 history
-				basicSqlSessionTemplate.selectOne("ClaimMapper.insertTmonMappingHistory", tranDetail);
-
-				//변경테이블
-				Map<String, Object> changeMap = new HashMap<String, Object>();
-				changeMap.put("sitename"   , detailRow.get("sitename"));               //사이트명
-				changeMap.put("m_ordercd"  , detailRow.get("m_ordercd"));
-				changeMap.put("ordercd"    , detailRow.get("ordercd"));
-				changeMap.put("productcd"  , detailRow.get("productcd"));
-				changeMap.put("statuscd"   , orderStatus);
-				changeMap.put("apistatuscd", 9); //6:취소요청,41 부분교환요청,42 부분반품요청,43 부분취소요청
-				//changeMap.put("reason"     , "재배송 요청 (회수 불가) : " + clmRsnNm + " / " + order.get("claimNo") + " / " + detailRow.get("m_ordercd") + " / " + detailRow.get("ordercd") + " / " + detailRow.get("productcd")); //취소요청 사유
-				changeMap.put("reason"     , "재배송 요청 (회수 불가) : " + clmRsnNm + " / claimNo : " + order.get("claimNo")); //취소요청 사유
-
-				Map<String, Object> changeRow = basicSqlSessionTemplate.selectOne("ClaimMapper.selectCommOrderChange", changeMap);
-				//logger.warn(">>cancelRequests changeMap : {}", changeMap);
-				if(null == changeRow) {
-					basicSqlSessionTemplate.insert("ClaimMapper.insertCommOrderChange", changeMap);
-					logUtil.insertOrderScheduleSuccessLog(logMap);
-				} else {
-					changeMap.put("seq", changeRow.get("seq"));
-					changeMap.put("apiindexing"   , "U");
-					basicSqlSessionTemplate.update("ClaimMapper.updateCommOrderChange", changeMap);
-					logUtil.insertOrderScheduleSuccessLog(logMap);
-				}
-
-				logger.warn("================== 재배송 생성 : {} , {}", detailRow.get("m_ordercd"), order.get("claimNo"));
 			}
+		}catch (Exception e){
+			e.printStackTrace();
 		}
+
 	}
 
 
