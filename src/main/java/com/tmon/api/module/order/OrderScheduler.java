@@ -44,7 +44,7 @@ public class OrderScheduler {
 
 	//결제완료 주문건 신규 생성처리 [배송 대상 수집]
 	//@Scheduled(cron = "0 0/10 * * * *")
-	@Scheduled(initialDelay = 2000, fixedDelay = 160000)
+	@Scheduled(initialDelay = 22000, fixedDelay = 160000)
 	public void getOrderList() throws Exception {
 		logger.warn(">>>>>>>>>>> getOrderList 결제완료 시작");
 		//대상조회 - 접수된 주문 조회
@@ -90,7 +90,7 @@ public class OrderScheduler {
 
 	//주문확인 연동 처리 [ 배송 대상 확인 ] 
 	//@Scheduled(cron = "0 0/13 * * * *")
-	@Scheduled(initialDelay = 2500, fixedDelay = 123000)
+	@Scheduled(initialDelay = 12500, fixedDelay = 123000)
 	public void confirmOrders() throws Exception {
 		logger.warn(">>>>>>>>>>> 주문확인 처리 시작");
 		//대상 조회
@@ -148,7 +148,7 @@ public class OrderScheduler {
 
 	//배송중 - 송장등록 처리 [ 송장 등록/수정 ] 
 	//@Scheduled(cron = "0 0/6 * * * ?")
-	@Scheduled(initialDelay = 3500, fixedDelay = 125000)
+	@Scheduled(initialDelay = 13500, fixedDelay = 125000)
 	public void shipOrders() throws Exception {
 		logger.warn(">>>>>>>>>>> 송장등록 처리 시작");
 		//대상 조회
@@ -209,7 +209,7 @@ public class OrderScheduler {
 
 
 	//주문 상태값 동기화 처리
-	@Scheduled(initialDelay = 1000, fixedDelay = 600000)
+	@Scheduled(initialDelay = 10000, fixedDelay = 600000)
 	public void setOrderStatusSync() throws Exception {
 		logger.warn(">>>>>>>>>>> setOrderStatusSync 주문건 상태 동기화 시작");
 		//대상조회 - 접수된 주문 조회
