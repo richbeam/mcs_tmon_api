@@ -298,7 +298,7 @@ public class OrderScheduler {
 				logger.warn(">>> getSettlement : settles {}", Settlements.size());
 				for(Map<String, Object> settlement : Settlements) {
 					try {
-						logger.warn("settlement :: {}",settlement.toString());
+						logger.warn("settlement ::::: {}",settlement.toString());
 						//orderService.syncOrderStatus(order);
 
 					} catch (Exception e) {
