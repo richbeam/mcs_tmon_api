@@ -274,7 +274,12 @@ public class ProdServiceImpl implements ProdService {
 					//도서산간 추가 배송비 셋팅
 					if(Integer.parseInt(mProduct.get("additionalshippingfee").toString()) > 0){
 						request.put("longDistanceDeliveryAvailable",true);		//	Boolean	도서산간지역 배송가능 여부	X	false
-						request.put("longDistanceDeliveryPrepay",true);			//	Boolean	도서산간지역 배송비 주문시 결제 여부	V		도서산간 배송가능여부가 true인 경우 필수
+						//착불일 경우 false
+						if(mProduct.get("shippingfeetype").toString().equals("03")){
+							request.put("longDistanceDeliveryPrepay",false);			//	Boolean	도서산간지역 배송비 주문시 결제 여부	V		도서산간 배송가능여부가 true인 경우 필수
+						}else {
+							request.put("longDistanceDeliveryPrepay",true);			//	Boolean	도서산간지역 배송비 주문시 결제 여부	V		도서산간 배송가능여부가 true인 경우 필수
+						}
 						request.put("longDistanceDeliveryFeeJeju",Integer.parseInt(mProduct.get("additionalshippingfee").toString()));			//	Integer+ (0..300000)	도서산간 제주 지역 추가 배송비	V		도서산간 배송가능여부와 도서산간 배송비 주문시결제여부가 true일 경우 필수
 						request.put("longDistanceDeliveryFeeExcludingJeju",Integer.parseInt(mProduct.get("additionalshippingfee").toString()));	//	Integer+ (0..300000)	도서간간 제주 제외한 지역 추가 배송비	V		도서산간 배송가능여부와 도서산간 배송비 주문시결제여부가 true일 경우 필수
 						//request.put("longDistanceDeliveryDiscriptionMin","");	//	Integer+ (0..300000)	도서산간차등 추가 배송비 최소금액	V		도서산간 배송가능여부가 true이고, 도서산간 배송비 주문시결제여부가 false인경우 필수
