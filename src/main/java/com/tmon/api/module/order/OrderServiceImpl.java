@@ -999,6 +999,41 @@ public class OrderServiceImpl implements OrderService{
 		}
 	}
 
+	/**
+	 * 정산데이터 동기화 [정산]
+	 *
+	 * @param settles
+	 * @throws UserDefinedException
+	 */
+	@Override
+	@Transactional(value="basicTxManager")
+	public void setSettlement(List<Map<String, Object>> settles) throws Exception{
+		try{
 
+			for(Map<String, Object> settlement : settles) {
+				try {
+					logger.warn("settlement ::::: {}",settlement.toString());
+					Map<String, Object> orderNo = (Map<String, Object>)settlement.get("orderNo");
+					settlement.put("tmonOrderNo",orderNo.get("tmonOrderNo"));
+					settlement.put("tmonOrderSubNo",orderNo.get("tmonOrderSubNo"));
+					settlement.put("individualOrderNo",orderNo.get("individualOrderNo"));
+					Map<String, Object> dealNo = (Map<String, Object>)settlement.get("dealNo");
+					settlement.put("tmonDealNo",dealNo.get("tmonDealNo"));
+					settlement.put("tmonDealOptionNo",dealNo.get("tmonDealOptionNo"));
+					settlement.put("managedTitle",dealNo.get("managedTitle"));
+					settlement.put("dealOptionTitle",dealNo.get("dealOptionTitle"));
+					//orderService.syncOrderStatus(order);
+					basicSqlSessionTemplate.update("OrderMapper.setSettlement", settlement);
+				} catch (Exception e) {
+					e.printStackTrace();
+					//logger.warn(">>> requestOrders error {}", e.getMessage());
+				}
+			}
+
+		}catch (Exception e){
+			e.printStackTrace();
+			logger.warn("setSettlement:::::::::::::::::: {}  동기화 실패.");
+		}
+	}
 
 }

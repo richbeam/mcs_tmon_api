@@ -292,8 +292,8 @@ public class OrderScheduler {
 		result = connector.call(HttpMethod.GET, path, params);
 		//주문등록
 		if(result != null ){
-			if(result.get("Settlement") != null) {
-				List<Map<String, Object>> Settlements =(List<Map<String, Object>>) result.get("Settlement");
+			if(result.get("settlementData") != null) {
+				List<Map<String, Object>> Settlements =(List<Map<String, Object>>) result.get("settlementData");
 				logger.warn(">>> getSettlement : settles {}", Settlements.size());
 				for(Map<String, Object> settlement : Settlements) {
 					try {
@@ -306,7 +306,7 @@ public class OrderScheduler {
 					}
 				}
 				logger.warn("-------------------------------------------------------------------------------");
-				List<Map<String, Object>> extraDatas =(List<Map<String, Object>>) result.get("ExtraData");
+				List<Map<String, Object>> extraDatas =(List<Map<String, Object>>) result.get("extraData");
 				for(Map<String, Object> extraData : extraDatas) {
 					try {
 						logger.warn("extraData :: {}",extraData.toString());

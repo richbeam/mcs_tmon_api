@@ -1,5 +1,6 @@
 package com.tmon.api.module.order;
 
+import java.util.List;
 import java.util.Map;
 
 import com.melchi.common.exception.UserDefinedException; 
@@ -54,5 +55,13 @@ public interface OrderService {
 	 * @throws UserDefinedException
 	 */
 	public void syncOrderStatus(Map<String, Object> order) throws Exception;
+
+	/**
+	 * 정산데이터 동기화 [정산]
+	 *
+	 * @param settles
+	 * @throws UserDefinedException
+	 */
+	public void setSettlement(List<Map<String, Object>> settles) throws Exception;
 
 }

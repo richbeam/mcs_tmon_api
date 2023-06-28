@@ -790,4 +790,87 @@
 		AND detail_no = #{detail_no}::TEXT
 		and shppno = #{shppNo}::TEXT
 	</select>
+
+
+
+
+
+	<update id="setSettlement" parameterType="hashMap">
+		/* OrderMapper.setSettlement */
+		WITH upsert AS (
+		  UPDATE tmon_settlement
+		    SET
+				tmonOrderNo = #{tmonOrderNo}::NUMERIC,
+				tmonOrderSubNo = #{tmonOrderSubNo}::NUMERIC,
+				individualOrderNo = #{individualOrderNo}::NUMERIC,
+				tmonDealNo = #{tmonDealNo}::NUMERIC,
+				tmonDealOptionNo = #{tmonDealOptionNo}::NUMERIC,
+				managedTitle = #{managedTitle}::TEXT,
+				dealOptionTitle = #{dealOptionTitle}::TEXT,
+				partnerNo = #{partnerNo}::NUMERIC,
+				settleDealType = #{settleDealType},
+				settleDealDetailType = #{settleDealDetailType}::TEXT,
+				salesDateTime = #{salesDateTime}::TEXT,
+				payDueDate = #{payDueDate}::TEXT,
+				sellAmount = #{sellAmount}::NUMERIC,
+				payBaseAmount = #{payBaseAmount}::NUMERIC,
+				payRate = #{payRate}::NUMERIC,
+				vendorAmount = #{vendorAmount}::NUMERIC,
+				tmonAmount = #{tmonAmount}::NUMERIC,
+				adjustCode = #{adjustCode}::NUMERIC,
+				discountPolicyNo = #{discountPolicyNo}::NUMERIC,
+				discountPolicyName = #{discountPolicyName}::TEXT,
+				modifydate = now()
+		    WHERE txSeqNo = #{txSeqNo}::TEXT
+		RETURNING* )
+		INSERT INTO tmon_settlement(
+						txSeqNo,
+						tmonOrderNo,
+						tmonOrderSubNo,
+						individualOrderNo,
+						tmonDealNo,
+						tmonDealOptionNo,
+						managedTitle,
+						dealOptionTitle,
+						partnerNo,
+						settleDealType,
+						settleDealDetailType,
+						salesDateTime,
+						payDueDate,
+						sellAmount,
+						payBaseAmount,
+						payRate,
+						vendorAmount,
+						tmonAmount,
+						adjustCode,
+						discountPolicyNo,
+						discountPolicyName,
+						regdate
+					)
+		 SELECT  #{txSeqNo}::TEXT,
+				 #{tmonOrderNo}::NUMERIC,
+				 #{tmonOrderSubNo}::NUMERIC,
+				 #{individualOrderNo}::NUMERIC,
+				 #{tmonDealNo}::NUMERIC,
+				 #{tmonDealOptionNo}::NUMERIC,
+				 #{managedTitle}::TEXT,
+				 #{dealOptionTitle}::TEXT,
+				 #{partnerNo}::NUMERIC,
+				 #{settleDealType}::TEXT,
+				 #{settleDealDetailType}::TEXT,
+				 #{salesDateTime}::TEXT,
+				 #{payDueDate}::TEXT,
+				 #{sellAmount}::NUMERIC,
+				 #{payBaseAmount}::NUMERIC,
+				 #{payRate}::NUMERIC,
+				 #{vendorAmount}::NUMERIC,
+				 #{tmonAmount}::NUMERIC,
+				 #{adjustCode}::NUMERIC,
+				 #{discountPolicyNo}::NUMERIC,
+				 #{discountPolicyName}::TEXT,
+				 now()
+		  WHERE NOT EXISTS(SELECT * FROM upsert)
+	</update>
+
+
 </mapper>

@@ -230,21 +230,33 @@ public class OrderController {
 		result = connector.call(HttpMethod.GET, path, params);
 		//주문등록
 		if(result != null ){
-			if(result.get("Settlement") != null) {
-				List<Map<String, Object>> Settlements =(List<Map<String, Object>>) result.get("Settlement");
+			if(result.get("settlementData") != null) {
+				List<Map<String, Object>> Settlements =(List<Map<String, Object>>) result.get("settlementData");
 				logger.warn(">>> getSettlement : settles {}", Settlements.size());
-				for(Map<String, Object> settlement : Settlements) {
+				/*for(Map<String, Object> settlement : Settlements) {
 					try {
 						logger.warn("settlement ::::: {}",settlement.toString());
-						//orderService.syncOrderStatus(order);
+						Map<String, Object> orderNo = (Map<String, Object>)settlement.get("orderNo");
+						settlement.put("tmonOrderNo",orderNo.get("tmonOrderNo"));
+						settlement.put("tmonOrderSubNo",orderNo.get("tmonOrderSubNo"));
+						settlement.put("individualOrderNo",orderNo.get("individualOrderNo"));
+						Map<String, Object> dealNo = (Map<String, Object>)settlement.get("dealNo");
+						settlement.put("tmonDealNo",dealNo.get("tmonDealNo"));
+						settlement.put("tmonDealOptionNo",dealNo.get("tmonDealOptionNo"));
+						settlement.put("managedTitle",dealNo.get("managedTitle"));
+						settlement.put("dealOptionTitle",dealNo.get("dealOptionTitle"));
+
 
 					} catch (Exception e) {
 						e.printStackTrace();
 						//logger.warn(">>> requestOrders error {}", e.getMessage());
 					}
-				}
-				logger.warn("-------------------------------------------------------------------------------");
-				List<Map<String, Object>> extraDatas =(List<Map<String, Object>>) result.get("ExtraData");
+				}*/
+
+				orderService.setSettlement(Settlements);
+
+				/*logger.warn("-------------------------------------------------------------------------------");
+				List<Map<String, Object>> extraDatas =(List<Map<String, Object>>) result.get("extraData");
 				for(Map<String, Object> extraData : extraDatas) {
 					try {
 						logger.warn("extraData :: {}",extraData.toString());
@@ -254,7 +266,7 @@ public class OrderController {
 						e.printStackTrace();
 						//logger.warn(">>> requestOrders error {}", e.getMessage());
 					}
-				}
+				}*/
 
 			} else {
 				logger.warn(">>> getSettlement 없음: getSettlement {} " );
