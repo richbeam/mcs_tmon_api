@@ -273,6 +273,7 @@ public class OrderScheduler {
 
 	//티몬 정산 가져오기
 	//@Scheduled(initialDelay = 1000, fixedDelay = 9600000)
+	@Scheduled(cron = "0 10 12,20 * * *")
 	public void getSettlement() throws Exception {
 		logger.warn(">>>>>>>>>>> getSettlement 정산 데이터  시작");
 		//대상조회 - 접수된 주문 조회
@@ -281,8 +282,10 @@ public class OrderScheduler {
 		Map<String, Object> result = null;
 		//판매 일지 정지
 		String path = "/settlement";
-		String searchDate = StringUtil.getTodayString("yyyy-MM-dd");
-		paramMap.put("searchDate", "2023-05-02");  // 	조회 일자 (yyyy-MM-dd)	O		조회 가능 범위 : 1일
+		String todday = StringUtil.getTodayString("yyyy-MM-dd");
+		String searchDate = StringUtil.orderDateAdd(todday,-1440);
+
+		paramMap.put("searchDate", searchDate);  // 	조회 일자 (yyyy-MM-dd)	O		조회 가능 범위 : 1일
 		params.setRequestParameters(paramMap);
 		params.setPathVariableParameters(paramMap);
 		//paramMap.put("searchDate", searchDate);  // 	조회 일자 (yyyy-MM-dd)	O		조회 가능 범위 : 1일
@@ -295,36 +298,14 @@ public class OrderScheduler {
 			if(result.get("settlementData") != null) {
 				List<Map<String, Object>> Settlements =(List<Map<String, Object>>) result.get("settlementData");
 				logger.warn(">>> getSettlement : settles {}", Settlements.size());
-				for(Map<String, Object> settlement : Settlements) {
-					try {
-						logger.warn("settlement ::::: {}",settlement.toString());
-						//orderService.syncOrderStatus(order);
 
-					} catch (Exception e) {
-						e.printStackTrace();
-						//logger.warn(">>> requestOrders error {}", e.getMessage());
-					}
-				}
-				logger.warn("-------------------------------------------------------------------------------");
-				List<Map<String, Object>> extraDatas =(List<Map<String, Object>>) result.get("extraData");
-				for(Map<String, Object> extraData : extraDatas) {
-					try {
-						logger.warn("extraData :: {}",extraData.toString());
-						//orderService.syncOrderStatus(order);
-
-					} catch (Exception e) {
-						e.printStackTrace();
-						//logger.warn(">>> requestOrders error {}", e.getMessage());
-					}
-				}
+				orderService.setSettlement(Settlements);
 
 			} else {
 				logger.warn(">>> getSettlement 없음: getSettlement {} " );
 			}
 
 		}
-
-
 
 		logger.warn(">>>>>>>>>>> getSettlement 정산 데이터  시작");
 	}
